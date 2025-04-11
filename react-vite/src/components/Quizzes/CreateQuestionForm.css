@@ -1,0 +1,68 @@
+.drawer-form {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 350px;
+    background: #f5f5ff;
+    padding: 2rem;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(0);
+    animation: slideIn 0.5s ease forwards;
+    z-index: 999;
+    overflow-y: auto;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0%);
+      opacity: 1;
+    }
+  }
+  
+  .drawer-form h2 {
+    margin-bottom: 1rem;
+  }
+  
+  .drawer-form input {
+    display: block;
+    margin: 0.5rem 0;
+    padding: 0.6rem;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  
+  .drawer-form button {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .drawer-form button:hover {
+    background-color: #388e3c;
+  }
+  
+  .drawer-form .success-msg {
+    color: green;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .drawer-form .error-list {
+    color: red;
+    font-size: 0.9rem;
+    list-style: circle;
+    padding-left: 1.2rem;
+  }
+  

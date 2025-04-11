@@ -1,15 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
+
+# These are for production schema handling
 import os
 environment = os.getenv("FLASK_ENV")
 SCHEMA = os.environ.get("SCHEMA")
 
-
-db = SQLAlchemy()
-
-# helper function for adding prefix to foreign key column references in production
-def add_prefix_for_prod(attr):
+def add_prefix_for_prod(table_name):
     if environment == "production":
-        return f"{SCHEMA}.{attr}"
+        return f"{SCHEMA}.{table_name}"
     else:
-        return attr
+        return table_name

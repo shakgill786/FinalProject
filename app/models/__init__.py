@@ -1,3 +1,4 @@
-from .db import db
-from .user import User
-from .db import environment, SCHEMA
+from .db import db, environment, SCHEMA, add_prefix_for_prod
+from .quiz import Quiz
+from .question import Question
+
