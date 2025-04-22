@@ -1,0 +1,91 @@
+.dashboard-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+}
+
+.dashboard-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.create-quiz-button {
+  background-color: #6c63ff;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 30px;
+  transition: background-color 0.3s ease;
+}
+
+.create-quiz-button:hover {
+  background-color: #5b52d6;
+}
+
+.quiz-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.quiz-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  width: 240px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: left;
+  transition: transform 0.2s ease;
+}
+
+.quiz-card:hover {
+  transform: translateY(-5px);
+}
+
+.quiz-card h2 {
+  margin: 0 0 10px;
+  font-size: 1.4rem;
+}
+
+.quiz-card p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+}
+
+.view-quiz-button,
+.manage-button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.view-quiz-button {
+  background-color: #007bff;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.manage-button {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.view-quiz-button:hover {
+  background-color: #0069d9;
+}
+
+.manage-button:hover {
+  background-color: #138496;
+}

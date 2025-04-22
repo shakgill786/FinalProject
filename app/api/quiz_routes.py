@@ -5,6 +5,7 @@ quiz_routes = Blueprint("quizzes", __name__)
 
 # Create a new quiz
 @quiz_routes.route("/", methods=["POST"])
+@quiz_routes.route("", methods=["POST"])
 def create_quiz():
     data = request.get_json()
     title = data.get("title")
@@ -51,3 +52,31 @@ def create_question(quiz_id):
 def get_questions_for_quiz(quiz_id):
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
     return jsonify([q.to_dict() for q in questions])
+
+# Update a specific question
+@quiz_routes.route("/<int:quiz_id>/questions/<int:question_id>", methods=["PUT"])
+def update_question(quiz_id, question_id):
+    data = request.get_json()
+    question = Question.query.get_or_404(question_id)
+
+    if question.quiz_id != quiz_id:
+        return {"error": "Invalid quiz ID."}, 400
+
+    question.question_text = data.get("question_text", question.question_text)
+    question.options = data.get("options", question.options)
+    question.answer = data.get("answer", question.answer)
+
+    db.session.commit()
+    return question.to_dict()
+
+# Delete a specific question
+@quiz_routes.route("/<int:quiz_id>/questions/<int:question_id>", methods=["DELETE"])
+def delete_question(quiz_id, question_id):
+    question = Question.query.get_or_404(question_id)
+
+    if question.quiz_id != quiz_id:
+        return {"error": "Invalid quiz ID."}, 400
+
+    db.session.delete(question)
+    db.session.commit()
+    return {"message": "Question deleted successfully"}, 200

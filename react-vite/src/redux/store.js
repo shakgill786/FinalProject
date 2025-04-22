@@ -1,3 +1,4 @@
+// src/redux/store.js
 import {
   legacy_createStore as createStore,
   applyMiddleware,
@@ -6,9 +7,11 @@ import {
 } from "redux";
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
+import quizzesReducer from "./quizzes"; 
 
 const rootReducer = combineReducers({
   session: sessionReducer,
+  quizzes: quizzesReducer,
 });
 
 let enhancer;

@@ -42,9 +42,12 @@ def restore_csrf():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    if path and os.path.exists(os.path.join(app.static_folder, path)):
+    # Always serve index.html unless it's an actual file
+    file_path = os.path.join(app.static_folder, path)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
         return app.send_static_file(path)
-    return app.send_static_file("index.html")
+    return app.send_static_file('index.html')
+
 
 # ✅ Fallback 404 handler
 @app.errorhandler(404)
