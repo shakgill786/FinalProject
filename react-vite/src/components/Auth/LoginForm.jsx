@@ -22,8 +22,10 @@ export default function LoginForm() {
     } else {
       // Default route for instructors, will expand later for student roles
       if (res?.role === "instructor") {
+        console.log("Redirecting to /dashboard/instructor");
         navigate("/dashboard/instructor");
       } else {
+        console.log("Redirecting to /")
         navigate("/"); // Default fallback
       }
     }
