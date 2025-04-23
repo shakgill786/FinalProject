@@ -19,18 +19,18 @@ def authenticate():
 
 @auth_routes.route('/login', methods=['POST'])
 def login():
-    """
-    Logs a user in
-    """
+    print("🔐 Login route hit!")
     form = LoginForm()
-    # Get the csrf_token from the request cookie and put it into the
-    # form manually to validate_on_submit can be used
-    form['csrf_token'].data = request.cookies['csrf_token']
+    form['csrf_token'].data = request.cookies.get('csrf_token')
+    print("📩 Form data received:", request.get_json())
+
     if form.validate_on_submit():
-        # Add the user to the session, we are logged in!
         user = User.query.filter(User.email == form.data['email']).first()
         login_user(user)
+        print("✅ Login success:", user.username)
         return user.to_dict()
+    
+    print("❌ Form validation failed:", form.errors)
     return form.errors, 401
 
 

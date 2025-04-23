@@ -1,71 +1,95 @@
-const SET_USER = 'session/setUser';
-const REMOVE_USER = 'session/removeUser';
+import { getCookie } from "../utils/csrf";
 
+const SET_USER = "session/setUser";
+const REMOVE_USER = "session/removeUser";
+
+// Action Creators
 const setUser = (user) => ({
   type: SET_USER,
-  payload: user
+  payload: user,
 });
 
 const removeUser = () => ({
-  type: REMOVE_USER
+  type: REMOVE_USER,
 });
 
-export const thunkAuthenticate = () => async (dispatch) => {
-	const response = await fetch("/api/auth/");
-	if (response.ok) {
-		const data = await response.json();
-		if (data.errors) {
-			return;
-		}
+// Thunks
 
-		dispatch(setUser(data));
-	}
+// ✅ Authenticate current user (e.g. on app load)
+export const thunkAuthenticate = () => async (dispatch) => {
+  const response = await fetch("/api/auth/", {
+    credentials: "include",
+  });
+  if (response.ok) {
+    const data = await response.json();
+    if (!data.errors) {
+      dispatch(setUser(data));
+    }
+  }
 };
 
-export const thunkLogin = (credentials) => async dispatch => {
+// ✅ Login thunk
+export const thunkLogin = (credentials) => async (dispatch) => {
+  const csrfToken = getCookie("csrf_token");
+
   const response = await fetch("/api/auth/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentials)
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrf_token"),
+    },
+    credentials: "include",
+    body: JSON.stringify(credentials),
   });
 
-  if(response.ok) {
+  if (response.ok) {
     const data = await response.json();
     dispatch(setUser(data));
+    return data; 
   } else if (response.status < 500) {
-    const errorMessages = await response.json();
-    return errorMessages
+    const errorData = await response.json();
+    return errorData;
   } else {
-    return { server: "Something went wrong. Please try again" }
+    return { errors: ["Something went wrong. Please try again."] };
   }
 };
 
-export const thunkSignup = (user) => async (dispatch) => {
+// ✅ Signup thunk
+export const thunkSignup = (userInfo) => async (dispatch) => {
+  const csrfToken = getCookie("csrf_token");
+
   const response = await fetch("/api/auth/signup", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(user)
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    credentials: "include",
+    body: JSON.stringify(userInfo),
   });
 
-  if(response.ok) {
+  if (response.ok) {
     const data = await response.json();
     dispatch(setUser(data));
+    return data;
   } else if (response.status < 500) {
-    const errorMessages = await response.json();
-    return errorMessages
+    const errorData = await response.json();
+    return errorData;
   } else {
-    return { server: "Something went wrong. Please try again" }
+    return { errors: ["Something went wrong. Please try again."] };
   }
 };
 
+// ✅ Logout thunk
 export const thunkLogout = () => async (dispatch) => {
-  await fetch("/api/auth/logout");
+  await fetch("/api/auth/logout", { credentials: "include" });
   dispatch(removeUser());
 };
 
+// Reducer
 const initialState = { user: null };
 
-function sessionReducer(state = initialState, action) {
+export default function sessionReducer(state = initialState, action) {
   switch (action.type) {
     case SET_USER:
       return { ...state, user: action.payload };
@@ -75,5 +99,3 @@ function sessionReducer(state = initialState, action) {
       return state;
   }
 }
-
-export default sessionReducer;
