@@ -8,6 +8,7 @@ export default function TakeQuiz() {
   const [currentQ, setCurrentQ] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showGif, setShowGif] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,21 +26,28 @@ export default function TakeQuiz() {
   const handleAnswer = (option) => {
     const isCorrect = option === questions[currentQ].answer;
     if (isCorrect) {
-      setCorrect(correct + 1);
+      setCorrect((prev) => prev + 1);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 1000);
     }
 
     setTimeout(() => {
       if (currentQ < questions.length - 1) {
-        setCurrentQ(currentQ + 1);
+        setCurrentQ((prev) => prev + 1);
       } else {
-        alert(`Quiz done! You got ${correct + (isCorrect ? 1 : 0)} right!`);
+        const totalCorrect = correct + (isCorrect ? 1 : 0);
+        const totalQuestions = questions.length;
+        if (totalCorrect === totalQuestions) {
+          setShowGif(true);
+        } else {
+          alert(`Quiz done! You got ${totalCorrect} out of ${totalQuestions} right.`);
+        }
       }
     }, 700);
   };
 
   if (loading) return <p>Loading questions...</p>;
+
   if (!questions.length) {
     return (
       <div className="quiz-play-container">
@@ -48,6 +56,17 @@ export default function TakeQuiz() {
         <Link to={`/quizzes/${quizId}/add-question`} className="add-question-btn">
           ➕ Add Question
         </Link>
+      </div>
+    );
+  }
+
+  if (showGif) {
+    return (
+      <div className="quiz-play-container">
+        <h2>🎉 Perfect Score!</h2>
+        <img src="/celebrate.gif" alt="Celebration" className="celebration-gif" />
+        <p>You got all the questions right! 🎊</p>
+        <Link to="/" className="add-question-btn">Back to Quizzes</Link>
       </div>
     );
   }

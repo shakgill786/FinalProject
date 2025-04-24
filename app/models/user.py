@@ -1,5 +1,3 @@
-# app/models/user.py
-
 from .db import db, environment, SCHEMA, add_prefix_for_prod
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -14,7 +12,10 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(40), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
     hashed_password = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default="student") 
+    role = db.Column(db.String(20), nullable=False, default="student")
+
+    # New: relationship for quiz attempts
+    quiz_attempts = db.relationship("QuizAttempt", back_populates="user", cascade="all, delete-orphan")
 
     @property
     def password(self):

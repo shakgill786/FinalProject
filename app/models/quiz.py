@@ -13,6 +13,9 @@ class Quiz(db.Model):
     grade_level = db.Column(db.String(20))  # e.g. "Grade 1", "Kindergarten"
 
     questions = db.relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
+    
+    # New: relationship for quiz attempts
+    quiz_attempts = db.relationship("QuizAttempt", back_populates="quiz", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

@@ -10,6 +10,7 @@ import TakeQuiz from "./components/Quizzes/TakeQuiz";
 import CreateQuizForm from "./components/Quizzes/CreateQuizForm";
 import CreateQuestionForm from "./components/Quizzes/CreateQuestionForm";
 import InstructorDashboard from "./components/Dashboard/InstructorDashboard";
+import StudentDashboard from "./components/Dashboard/StudentDashboard";
 import ManageQuestions from "./components/Quizzes/ManageQuestions";
 import LoginForm from "./components/Auth/LoginForm";
 
@@ -22,10 +23,7 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // Restore CSRF and authenticate user on app load
-    fetch("/api/csrf/restore", {
-      credentials: "include",
-    })
+    fetch("/api/csrf/restore", { credentials: "include" })
       .then(() => {
         console.log("✅ CSRF cookie restored");
         dispatch(thunkAuthenticate());
@@ -33,13 +31,13 @@ export default function App() {
       .catch((err) => console.error("❌ CSRF restore failed:", err));
   }, [dispatch]);
 
-  // 🔄 Redirect if logged in and currently on /login
+  // 🔄 Redirect from /login if already logged in
   if (sessionUser && location.pathname === "/login") {
     const target =
       sessionUser.role === "instructor"
         ? "/dashboard/instructor"
-        : "/";
-    return <Navigate to={target} />;
+        : "/dashboard/student";
+    return <Navigate to={target} replace />;
   }
 
   return (
@@ -59,9 +57,10 @@ export default function App() {
           path="/dashboard/instructor/quizzes/:quizId/manage-questions"
           element={<ManageQuestions />}
         />
+
+        {/* Student Routes */}
+        <Route path="/dashboard/student" element={<StudentDashboard />} />
       </Routes>
     </>
   );
 }
-
-console.log("✅ App loaded");
