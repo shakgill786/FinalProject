@@ -14,9 +14,16 @@ class User(db.Model, UserMixin):
     hashed_password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), nullable=False, default="student")
 
-    # New: relationship for quiz attempts
+    # 🔁 Relationships
     quiz_attempts = db.relationship("QuizAttempt", back_populates="user", cascade="all, delete-orphan")
+    classrooms = db.relationship("Classroom", back_populates="instructor", cascade="all, delete-orphan")  # for instructors
+    enrolled_classrooms = db.relationship(
+        "Classroom",
+        secondary="classroom_students",
+        back_populates="students"
+    )  # for students
 
+    # ✅ Password methods
     @property
     def password(self):
         return self.hashed_password
@@ -28,6 +35,7 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
+    # ✅ User dict
     def to_dict(self):
         return {
             'id': self.id,

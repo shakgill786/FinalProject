@@ -1,0 +1,63 @@
+/* src/components/Dashboard/InstructorClassroomsDashboard.css */
+.classrooms-dashboard {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+  }
+  
+  .create-classroom {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  
+  .create-classroom input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .create-classroom button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .create-classroom button:hover {
+    background-color: #45a049;
+  }
+  
+  .classroom-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .classroom-card {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    flex: 1 1 300px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .classroom-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .classroom-buttons button {
+    padding: 8px 12px;
+    font-size: 14px;
+    background: #eee;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .classroom-buttons button:hover {
+    background: #ddd;
+  }
+  

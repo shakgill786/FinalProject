@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import "./TakeQuiz.css";
 
 export default function TakeQuiz() {
@@ -8,8 +8,11 @@ export default function TakeQuiz() {
   const [currentQ, setCurrentQ] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [showGif, setShowGif] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [timestamps, setTimestamps] = useState([]);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [quizDone, setQuizDone] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -17,6 +20,7 @@ export default function TakeQuiz() {
       if (res.ok) {
         const data = await res.json();
         setQuestions(data);
+        setStartTime(Date.now()); // Set the time for the first question
       }
       setLoading(false);
     };
@@ -28,26 +32,42 @@ export default function TakeQuiz() {
     if (isCorrect) {
       setCorrect((prev) => prev + 1);
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 1000);
+      setTimeout(() => setShowConfetti(false), 500);
     }
+
+    const endTime = Date.now();
+    const elapsedSeconds = (endTime - startTime) / 1000;
+    setTimestamps((prev) => [...prev, elapsedSeconds]);
 
     setTimeout(() => {
       if (currentQ < questions.length - 1) {
-        setCurrentQ((prev) => prev + 1);
+        setCurrentQ(currentQ + 1);
+        setStartTime(Date.now()); // Reset timer for next question
       } else {
-        const totalCorrect = correct + (isCorrect ? 1 : 0);
-        const totalQuestions = questions.length;
-        if (totalCorrect === totalQuestions) {
-          setShowGif(true);
-        } else {
-          alert(`Quiz done! You got ${totalCorrect} out of ${totalQuestions} right.`);
-        }
+        setQuizDone(true);
+        submitAttempt(isCorrect ? correct + 1 : correct);
       }
     }, 700);
   };
 
-  if (loading) return <p>Loading questions...</p>;
+  const submitAttempt = async (finalCorrect) => {
+    const score = Math.round((finalCorrect / questions.length) * 100);
+    console.log({ score, timestamps });
+    const res = await fetch(`/api/quizzes/${quizId}/attempt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ score, timestamps }),
+    });
 
+    if (res.ok) {
+      console.log("✅ Attempt submitted");
+    } else {
+      console.error("❌ Failed to submit attempt");
+    }
+  };
+
+  if (loading) return <p>Loading questions...</p>;
   if (!questions.length) {
     return (
       <div className="quiz-play-container">
@@ -60,13 +80,19 @@ export default function TakeQuiz() {
     );
   }
 
-  if (showGif) {
+  if (quizDone) {
+    const finalScore = Math.round((correct / questions.length) * 100);
+  
     return (
-      <div className="quiz-play-container">
-        <h2>🎉 Perfect Score!</h2>
-        <img src="/celebrate.gif" alt="Celebration" className="celebration-gif" />
-        <p>You got all the questions right! 🎊</p>
-        <Link to="/" className="add-question-btn">Back to Quizzes</Link>
+      <div className="quiz-complete-container">
+        <h2>{finalScore === 100 ? "🎉 Perfect Score!" : "✅ Quiz Complete!"}</h2>
+        {finalScore === 100 && (
+          <img src="/celebrate.gif" alt="Celebration" />
+        )}
+        <p>
+          You got {correct} out of {questions.length} questions right ({finalScore}%)
+        </p>
+        <button onClick={() => navigate("/")}>Back to Quizzes</button>
       </div>
     );
   }
@@ -85,9 +111,6 @@ export default function TakeQuiz() {
         ))}
       </div>
       {showConfetti && <div className="confetti">🎉</div>}
-      <Link to={`/quizzes/${quizId}/add-question`} className="add-question-btn">
-        ➕ Add Another Question
-      </Link>
     </div>
   );
 }

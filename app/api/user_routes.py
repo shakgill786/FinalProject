@@ -15,3 +15,9 @@ def users():
 def user(id):
     user = User.query.get(id)
     return user.to_dict()
+
+@user_routes.route('/all-students')
+@login_required
+def get_all_students():
+    students = User.query.filter_by(role="student").all()
+    return {'students': [student.to_dict() for student in students]}

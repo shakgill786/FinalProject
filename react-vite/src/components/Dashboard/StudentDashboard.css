@@ -45,3 +45,21 @@
     background-color: #2f855a;
   }
   
+  .leaderboard-btn {
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0, 114, 255, 0.6);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .leaderboard-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 16px rgba(0, 114, 255, 0.9);
+  }
+  

@@ -1,0 +1,104 @@
+/* Leaderboard.css */
+
+.leaderboard-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fffbea;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 200, 0, 0.3);
+  text-align: center;
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+}
+
+.leaderboard-container h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #d97706;
+  animation: pulseTitle 2s infinite;
+}
+
+@keyframes pulseTitle {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); color: #facc15; }
+  100% { transform: scale(1); }
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+}
+
+.leaderboard-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  margin-bottom: 0.6rem;
+  border-radius: 8px;
+  background: #fff4d1;
+  border: 2px solid #ffe79b;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+.leaderboard-list li:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+.rank {
+  font-weight: bold;
+  margin-right: 1rem;
+  font-size: 1.1rem;
+}
+
+.name {
+  flex-grow: 1;
+  font-weight: bold;
+  color: #3b3b3b;
+}
+
+.points {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #8b5cf6;
+}
+
+/* Special styling for top 3 ranks */
+.leaderboard-list li:nth-child(1) {
+  background: linear-gradient(90deg, #ffd700, #fff8dc);
+  border-color: gold;
+  color: #b45309;
+  font-weight: bold;
+  animation: glowGold 2s infinite alternate;
+}
+
+.leaderboard-list li:nth-child(2) {
+  background: linear-gradient(90deg, #c0c0c0, #f8f8f8);
+  border-color: silver;
+  color: #52525b;
+  animation: glowSilver 2s infinite alternate;
+}
+
+.leaderboard-list li:nth-child(3) {
+  background: linear-gradient(90deg, #cd7f32, #fce7d3);
+  border-color: #cd7f32;
+  color: #7c2d12;
+  animation: glowBronze 2s infinite alternate;
+}
+
+@keyframes glowGold {
+  from { box-shadow: 0 0 10px gold; }
+  to { box-shadow: 0 0 20px gold; }
+}
+
+@keyframes glowSilver {
+  from { box-shadow: 0 0 10px silver; }
+  to { box-shadow: 0 0 20px silver; }
+}
+
+@keyframes glowBronze {
+  from { box-shadow: 0 0 10px #cd7f32; }
+  to { box-shadow: 0 0 20px #cd7f32; }
+}

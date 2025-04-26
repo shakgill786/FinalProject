@@ -11,6 +11,7 @@ class QuizAttempt(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("users.id")), nullable=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("quizzes.id")), nullable=False)
     score = db.Column(db.Float, nullable=False)
+    points = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", back_populates="quiz_attempts")
@@ -22,6 +23,7 @@ class QuizAttempt(db.Model):
             "user_id": self.user_id,
             "quiz_id": self.quiz_id,
             "score": self.score,
+            "points": self.points,
             "timestamp": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "quiz": self.quiz.to_dict()
         }

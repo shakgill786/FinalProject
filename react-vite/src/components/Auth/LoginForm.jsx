@@ -1,9 +1,6 @@
-// react-vite/src/components/Auth/LoginForm.jsx
-
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { thunkLogin } from "../../redux/session";
 
 export default function LoginForm() {
@@ -18,14 +15,15 @@ export default function LoginForm() {
     e.preventDefault();
     setErrors([]);
 
+    // ✅ Fetch fresh CSRF token before attempting login
+    await fetch("/api/csrf/restore", { credentials: "include" });
+
     const res = await dispatch(thunkLogin({ email, password }));
 
     if (res?.errors || res?.email || res?.password) {
       const err = res.errors || Object.values(res).flat();
       setErrors(err);
     } else {
-      toast.success(`Welcome back, ${res.username}!`);
-
       if (res?.role === "instructor") {
         navigate("/dashboard/instructor");
       } else {

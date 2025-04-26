@@ -20,9 +20,15 @@ export default function InstructorDashboard() {
   return (
     <div className="dashboard-container">
       <h1>Instructor Dashboard</h1>
-      <Link to="/create">
-        <button className="create-quiz-button">➕ Create New Quiz</button>
-      </Link>
+
+      <div className="dashboard-buttons">
+        <Link to="/create">
+          <button className="create-quiz-button">➕ Create New Quiz</button>
+        </Link>
+        <Link to="/dashboard/instructor/classrooms">
+          <button className="manage-classrooms-button">🏫 Manage Classrooms</button>
+        </Link>
+      </div>
 
       <div className="quiz-list">
         {quizzes.map((quiz) => (

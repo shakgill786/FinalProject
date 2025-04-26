@@ -12,6 +12,8 @@ from .seeds import seed_commands
 # ✅ Import blueprints
 from .api.auth_routes import auth_routes
 from .api.quiz_routes import quiz_routes
+from .api.classroom_routes import classroom_routes
+from .api.user_routes import user_routes
 
 # ✅ Create Flask app and serve React build
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
@@ -38,6 +40,8 @@ def load_user(user_id):
 # ✅ Register blueprints
 app.register_blueprint(auth_routes, url_prefix="/api/auth")
 app.register_blueprint(quiz_routes, url_prefix="/api/quizzes")
+app.register_blueprint(classroom_routes, url_prefix="/api/classrooms")
+app.register_blueprint(user_routes, url_prefix="/api/users")
 
 # ✅ Register seed CLI
 app.cli.add_command(seed_commands)
