@@ -5,6 +5,7 @@ from .question import Question
 from .user import User
 from .classroom import Classroom
 from .classroom_students import ClassroomStudent
+from .classroom_quiz import ClassroomQuiz
 
 __all__ = [
     'db',

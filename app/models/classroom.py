@@ -13,6 +13,7 @@ class Classroom(db.Model):
     name = db.Column(db.String(100), nullable=False)
     instructor_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("users.id")), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    assigned_quizzes = db.relationship("ClassroomQuiz", back_populates="classroom", cascade="all, delete-orphan")
 
     # Relationships
     instructor = db.relationship("User", back_populates="classrooms")
