@@ -124,3 +124,39 @@ def modify_classroom_students(classroom_id):
 
     db.session.commit()
     return classroom.to_dict()
+
+# ✅ Assign a quiz to a classroom
+@classroom_routes.route("/<int:classroom_id>/assign-quiz", methods=["POST"])
+@login_required
+def assign_quiz_to_classroom(classroom_id):
+    if current_user.role != "instructor":
+        return {"error": "Unauthorized"}, 403
+
+    classroom = Classroom.query.get_or_404(classroom_id)
+
+    if classroom.instructor_id != current_user.id:
+        return {"error": "Unauthorized"}, 403
+
+    data = request.get_json()
+    quiz_id = data.get("quiz_id")
+
+    if not quiz_id:
+        return {"error": "Quiz ID required"}, 400
+
+    # Make sure you import this!
+    from app.models.classroom_quiz import ClassroomQuiz
+
+    # Check if this quiz is already assigned (optional)
+    existing = ClassroomQuiz.query.filter_by(classroom_id=classroom_id, quiz_id=quiz_id).first()
+    if existing:
+        return {"error": "Quiz already assigned"}, 400
+
+    assignment = ClassroomQuiz(
+        classroom_id=classroom_id,
+        quiz_id=quiz_id
+    )
+
+    db.session.add(assignment)
+    db.session.commit()
+
+    return {"message": "Quiz assigned successfully!"}, 201

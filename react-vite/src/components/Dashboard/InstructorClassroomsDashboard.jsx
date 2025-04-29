@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; // ✅ Optional: for success toasts!
+import { toast } from "react-toastify";
 import "./InstructorClassroomsDashboard.css";
 
 export default function InstructorClassroomsDashboard() {
@@ -37,8 +37,8 @@ export default function InstructorClassroomsDashboard() {
 
     if (res.ok) {
       setNewName("");
-      toast.success("🎉 Classroom created!"); // ✅ Optional cute toast
-      await fetchClassrooms(); // ✅ Always reload the list
+      toast.success("🎉 Classroom created!");
+      await fetchClassrooms();
     } else {
       toast.error("❌ Failed to create classroom.");
     }
@@ -117,6 +117,9 @@ export default function InstructorClassroomsDashboard() {
                     <button onClick={() => setEditingId(classroom.id)}>✏️ Edit</button>
                     <button onClick={() => navigate(`/classrooms/${classroom.id}/manage-students`)}>
                       🎯 Manage Students
+                    </button>
+                    <button onClick={() => navigate(`/dashboard/instructor/classrooms/${classroom.id}/assign-quizzes`)}>
+                      📝 Assign Quizzes
                     </button>
                     <button onClick={() => deleteClassroom(classroom.id)}>🗑️ Delete</button>
                   </div>

@@ -1,4 +1,5 @@
 // src/components/Dashboard/AssignQuizPage.jsx
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -75,7 +76,7 @@ export default function AssignQuizPage() {
               <button
                 disabled={assignedQuizIds.has(quiz.id)}
                 onClick={() => handleAssign(quiz.id)}
-                className="assign-btn"
+                className={`assign-btn ${assignedQuizIds.has(quiz.id) ? "assigned" : ""}`}
               >
                 {assignedQuizIds.has(quiz.id) ? "✅ Assigned" : "➕ Assign Quiz"}
               </button>
