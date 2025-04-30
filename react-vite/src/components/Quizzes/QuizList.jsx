@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./QuizList.css";
 
@@ -9,13 +8,18 @@ export default function QuizList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchQuizzes = async () => {
-      const res = await fetch("/api/quizzes");
-      const data = await res.json();
-      setQuizzes(data);
+    (async () => {
+      const res = await fetch("/api/quizzes", {
+        credentials: "include",        // ← include the session cookie
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setQuizzes(data);
+      } else {
+        console.error("Failed to load quizzes:", res.status);
+      }
       setLoading(false);
-    };
-    fetchQuizzes();
+    })();
   }, []);
 
   if (loading) return <p>Loading quizzes...</p>;
@@ -30,12 +34,6 @@ export default function QuizList() {
             <h3>{quiz.title}</h3>
             <p>{quiz.grade_level}</p>
             <p>{quiz.description}</p>
-            <span className="badge bounce">🎖 Ready to Learn</span>
-            <img
-              src="/badges/gold-star.png"
-              alt="badge"
-              className="badge-img spin"
-            />
             <button
               className="view-btn"
               onClick={() => navigate(`/quizzes/${quiz.id}`)}
