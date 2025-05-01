@@ -11,9 +11,13 @@ export const getAllQuizzes = () => async (dispatch) => {
   const res = await fetch("/api/quizzes", {
     credentials: "include",
   });
+
   if (res.ok) {
     const data = await res.json();
     dispatch(loadQuizzes(data));
+  } else {
+    const err = await res.json();
+    console.error("Failed to load quizzes:", err);
   }
 };
 

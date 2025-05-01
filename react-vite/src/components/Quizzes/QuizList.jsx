@@ -9,7 +9,7 @@ export default function QuizList() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/quizzes", {
+      const res = await fetch("/api/quizzes/", {
         credentials: "include",        // ← include the session cookie
       });
       if (res.ok) {

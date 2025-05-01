@@ -22,7 +22,7 @@ export default function AssignQuizPage() {
   }, []);
 
   const fetchQuizzes = async () => {
-    const res = await fetch("/api/quizzes", { credentials: "include" });
+    const res = await fetch("/api/quizzes/", { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
       setAllQuizzes(data);

@@ -1,5 +1,6 @@
 import { getCookie } from "../utils/csrf";
 
+// Action Types
 const SET_USER = "session/setUser";
 const REMOVE_USER = "session/removeUser";
 
@@ -15,11 +16,12 @@ const removeUser = () => ({
 
 // Thunks
 
-// ✅ Authenticate current user (e.g. on app load)
+// ✅ Authenticate current user (used on app load)
 export const thunkAuthenticate = () => async (dispatch) => {
   const response = await fetch("/api/auth/", {
     credentials: "include",
   });
+
   if (response.ok) {
     const data = await response.json();
     if (!data.errors) {
@@ -36,7 +38,7 @@ export const thunkLogin = (credentials) => async (dispatch) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrf_token"),
+      "X-CSRFToken": csrfToken, // ✅ Fixed
     },
     credentials: "include",
     body: JSON.stringify(credentials),
@@ -45,7 +47,7 @@ export const thunkLogin = (credentials) => async (dispatch) => {
   if (response.ok) {
     const data = await response.json();
     dispatch(setUser(data));
-    return data; 
+    return data;
   } else if (response.status < 500) {
     const errorData = await response.json();
     return errorData;
@@ -62,7 +64,7 @@ export const thunkSignup = (userInfo) => async (dispatch) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": csrfToken,
+      "X-CSRFToken": csrfToken, // ✅ Fixed
     },
     credentials: "include",
     body: JSON.stringify(userInfo),
