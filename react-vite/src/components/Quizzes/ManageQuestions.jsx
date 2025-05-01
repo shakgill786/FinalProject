@@ -1,53 +1,115 @@
+// react-vite/src/components/Quizzes/ManageQuestions.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import QuestionCard from "./QuestionCard";
+import { getCookie } from "../../utils/csrf";
 import "./ManageQuestions.css";
 
 export default function ManageQuestions() {
   const { quizId } = useParams();
   const [questions, setQuestions] = useState([]);
+  const [newQ, setNewQ]           = useState("");
+  const [options, setOptions]     = useState(["", ""]);
+  const [answer, setAnswer]       = useState("");
+  const [errors, setErrors]       = useState([]);
+
+  const fetchQuestions = async () => {
+    const res = await fetch(`/api/quizzes/${quizId}/questions`, {
+      credentials: "include",
+    });
+    if (res.ok) setQuestions(await res.json());
+  };
 
   useEffect(() => {
-    fetch(`/api/quizzes/${quizId}/questions`)
-      .then((res) => res.json())
-      .then((data) => setQuestions(data));
+    fetchQuestions();
   }, [quizId]);
 
-  const handleDelete = async (questionId) => {
-    if (!window.confirm("Delete this question?")) return;
-    const res = await fetch(`/api/quizzes/${quizId}/questions/${questionId}`, {
-      method: "DELETE",
+  const addOption = () => setOptions([...options, ""]);
+
+  const changeOption = (i, val) => {
+    const o = [...options]; o[i] = val; setOptions(o);
+  };
+
+  const handleCreate = async () => {
+    setErrors([]);
+    await fetch("/api/csrf/restore", { credentials: "include" });
+
+    const res = await fetch(`/api/quizzes/${quizId}/questions`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken":   getCookie("csrf_token"),
+      },
+      body: JSON.stringify({
+        question_text: newQ.trim(),
+        options,
+        answer: answer.trim(),
+      }),
     });
+
     if (res.ok) {
-      setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      setNewQ("");
+      setOptions(["", ""]);
+      setAnswer("");
+      fetchQuestions();
+    } else {
+      const data = await res.json();
+      setErrors(data.errors || ["Something went wrong"]);
     }
   };
 
-  const handleUpdate = async (questionId, updatedData) => {
-    const res = await fetch(`/api/quizzes/${quizId}/questions/${questionId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedData),
+  const handleDelete = async (qId) => {
+    if (!window.confirm("Delete this question?")) return;
+    await fetch(`/api/quizzes/${quizId}/questions/${qId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: { "X-CSRFToken": getCookie("csrf_token") },
     });
-    if (res.ok) {
-      const updatedQuestion = await res.json();
-      setQuestions((prev) =>
-        prev.map((q) => (q.id === questionId ? updatedQuestion : q))
-      );
-    }
+    fetchQuestions();
   };
 
   return (
-    <div className="manage-questions-container">
-      <h2>🧩 Manage Questions</h2>
-      {questions.map((q) => (
-        <QuestionCard
-          key={q.id}
-          question={q}
-          onDelete={handleDelete}
-          onUpdate={handleUpdate}
+    <div className="manage-questions">
+      <h2>Manage Questions for Quiz #{quizId}</h2>
+      {errors.length > 0 && (
+        <ul className="form-errors">
+          {errors.map((e,i)=><li key={i}>{e}</li>)}
+        </ul>
+      )}
+
+      <div className="new-question">
+        <textarea
+          placeholder="Question text"
+          value={newQ}
+          onChange={(e) => setNewQ(e.target.value)}
         />
-      ))}
+        {options.map((opt, i) => (
+          <input
+            key={i}
+            placeholder={`Option ${i+1}`}
+            value={opt}
+            onChange={(e) => changeOption(i, e.target.value)}
+          />
+        ))}
+        <button onClick={addOption}>➕ Add Option</button>
+        <input
+          placeholder="Answer"
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+        />
+        <button onClick={handleCreate}>Create Question</button>
+      </div>
+
+      <ul className="question-list">
+        {questions.map((q) => (
+          <li key={q.id}>
+            <strong>{q.question_text}</strong>
+            <ul>{q.options.map((o,i)=><li key={i}>{o}</li>)}</ul>
+            <em>Answer: {q.answer}</em>
+            <button onClick={() => handleDelete(q.id)}>🗑️ Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

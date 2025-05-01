@@ -1,22 +1,21 @@
-// react-vite/src/components/Quizzes/EditQuizForm.jsx
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getCookie } from "../../utils/csrf";
 import "./EditQuizForm.css";
 
 export default function EditQuizForm() {
   const { quizId } = useParams();
-  const navigate = useNavigate();
+  const navigate   = useNavigate();
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle]           = useState("");
   const [description, setDescription] = useState("");
   const [gradeLevel, setGradeLevel] = useState("");
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors]         = useState([]);
 
-  // 1️⃣ Load existing quiz
+  // load existing
   useEffect(() => {
-    (async () => {
+    async function loadQuiz() {
       const res = await fetch(`/api/quizzes/${quizId}`, {
         credentials: "include",
       });
@@ -28,19 +27,28 @@ export default function EditQuizForm() {
       } else {
         toast.error("❌ Could not load quiz data");
       }
-    })();
+    }
+    loadQuiz();
   }, [quizId]);
 
-  // 2️⃣ Submit update
+  // submit update
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors([]);
 
+    const csrfToken = getCookie("csrf_token");
     const res = await fetch(`/api/quizzes/${quizId}`, {
       method: "PUT",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, grade_level: gradeLevel }),
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken":   csrfToken,
+      },
+      body: JSON.stringify({
+        title:       title.trim(),
+        description: description.trim(),
+        grade_level: gradeLevel.trim()
+      }),
     });
 
     if (res.ok) {
@@ -58,9 +66,7 @@ export default function EditQuizForm() {
 
       {errors.length > 0 && (
         <ul className="form-errors">
-          {errors.map((err, i) => (
-            <li key={i}>{err}</li>
-          ))}
+          {errors.map((err, i) => <li key={i}>{err}</li>)}
         </ul>
       )}
 
