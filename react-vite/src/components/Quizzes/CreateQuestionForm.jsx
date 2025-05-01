@@ -1,39 +1,44 @@
-// react-vite/src/components/Quizzes/CreateQuizForm.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getCookie } from "../../utils/csrf";
-import "./CreateQuizForm.css";
+import "./CreateQuizForm.css"; // Reuse styles
 
-export default function CreateQuizForm() {
+export default function CreateQuestionForm() {
+  const { quizId } = useParams();
   const navigate = useNavigate();
-  const [title, setTitle]           = useState("");
-  const [description, setDescription] = useState("");
-  const [gradeLevel, setGradeLevel] = useState("");
-  const [errors, setErrors]         = useState([]);
+  const [questionText, setQuestionText] = useState("");
+  const [options, setOptions] = useState(["", ""]);
+  const [answer, setAnswer] = useState("");
+  const [errors, setErrors] = useState([]);
+
+  const addOption = () => setOptions([...options, ""]);
+  const updateOption = (i, val) => {
+    const newOpts = [...options];
+    newOpts[i] = val;
+    setOptions(newOpts);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors([]);
-
-    // ensure fresh CSRF
     await fetch("/api/csrf/restore", { credentials: "include" });
 
-    const res = await fetch("/api/quizzes/", {
+    const res = await fetch(`/api/quizzes/${quizId}/questions`, {
       method: "POST",
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken":   getCookie("csrf_token"),
+        "X-CSRFToken": getCookie("csrf_token"),
       },
+      credentials: "include",
       body: JSON.stringify({
-        title:       title.trim(),
-        description: description.trim(),
-        grade_level: gradeLevel.trim(),
+        question_text: questionText.trim(),
+        options,
+        answer: answer.trim(),
       }),
     });
 
     if (res.ok) {
-      navigate("/dashboard/instructor");
+      navigate(`/dashboard/instructor/quizzes/${quizId}/manage-questions`);
     } else {
       const data = await res.json();
       setErrors(data.errors || ["Something went wrong"]);
@@ -42,31 +47,35 @@ export default function CreateQuizForm() {
 
   return (
     <form onSubmit={handleSubmit} className="create-quiz-form">
-      <h2>Create a New Quiz</h2>
+      <h2>➕ Add New Question</h2>
       {errors.length > 0 && (
         <ul className="form-errors">
           {errors.map((e, i) => <li key={i}>{e}</li>)}
         </ul>
       )}
-      <input
-        type="text"
-        placeholder="Quiz Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+      <textarea
+        placeholder="Question Text"
+        value={questionText}
+        onChange={(e) => setQuestionText(e.target.value)}
         required
       />
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
+      {options.map((opt, i) => (
+        <input
+          key={i}
+          placeholder={`Option ${i + 1}`}
+          value={opt}
+          onChange={(e) => updateOption(i, e.target.value)}
+          required
+        />
+      ))}
+      <button type="button" onClick={addOption}>➕ Add Option</button>
       <input
-        type="text"
-        placeholder="Grade Level"
-        value={gradeLevel}
-        onChange={(e) => setGradeLevel(e.target.value)}
+        placeholder="Correct Answer"
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        required
       />
-      <button type="submit">Create Quiz</button>
+      <button type="submit">Create Question</button>
     </form>
   );
 }
