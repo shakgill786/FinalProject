@@ -1,14 +1,14 @@
-// src/components/Dashboard/InstructorClassroomsDashboard.jsx
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getCookie } from "../../utils/csrf";
 import "./InstructorClassroomsDashboard.css";
 
 export default function InstructorClassroomsDashboard() {
   const [classrooms, setClassrooms] = useState([]);
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -27,10 +27,14 @@ export default function InstructorClassroomsDashboard() {
 
   const createClassroom = async () => {
     if (!newName.trim()) return;
+    await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch("/api/classrooms/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrf_token"),
+      },
       credentials: "include",
       body: JSON.stringify({ name: newName }),
     });
@@ -46,16 +50,22 @@ export default function InstructorClassroomsDashboard() {
 
   const updateClassroom = async (id, updatedName) => {
     if (!updatedName.trim()) return;
+    await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch(`/api/classrooms/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrf_token"),
+      },
       credentials: "include",
       body: JSON.stringify({ name: updatedName }),
     });
 
     if (res.ok) {
+      toast.success("✅ Classroom name updated!");
       setEditingId(null);
+      setEditingName("");
       await fetchClassrooms();
     } else {
       toast.error("❌ Failed to update classroom.");
@@ -65,9 +75,13 @@ export default function InstructorClassroomsDashboard() {
   const deleteClassroom = async (id) => {
     const confirmed = window.confirm("Are you sure you want to delete this classroom?");
     if (!confirmed) return;
+    await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch(`/api/classrooms/${id}`, {
       method: "DELETE",
+      headers: {
+        "X-CSRFToken": getCookie("csrf_token"),
+      },
       credentials: "include",
     });
 
@@ -102,19 +116,43 @@ export default function InstructorClassroomsDashboard() {
           {classrooms.map((classroom) => (
             <div key={classroom.id} className="classroom-card">
               {editingId === classroom.id ? (
-                <input
-                  type="text"
-                  defaultValue={classroom.name}
-                  onBlur={(e) => updateClassroom(classroom.id, e.target.value)}
-                  autoFocus
-                />
+                <div className="edit-classroom-controls">
+                  <input
+                    type="text"
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    autoFocus
+                  />
+                  <div className="edit-buttons">
+                    <button
+                      onClick={() => updateClassroom(classroom.id, editingName)}
+                    >
+                      ✅ Done
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditingName("");
+                      }}
+                    >
+                      ❌ Cancel
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <>
                   <h2>{classroom.name}</h2>
                   <p><strong>{classroom.students?.length || 0}</strong> students enrolled</p>
 
                   <div className="classroom-buttons">
-                    <button onClick={() => setEditingId(classroom.id)}>✏️ Edit</button>
+                    <button
+                      onClick={() => {
+                        setEditingId(classroom.id);
+                        setEditingName(classroom.name);
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
                     <button onClick={() => navigate(`/classrooms/${classroom.id}/manage-students`)}>
                       🎯 Manage Students
                     </button>
