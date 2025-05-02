@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { getCookie } from "../../utils/csrf";
 import "./TakeQuiz.css";
 
 export default function TakeQuiz() {
@@ -20,7 +21,7 @@ export default function TakeQuiz() {
       if (res.ok) {
         const data = await res.json();
         setQuestions(data);
-        setStartTime(Date.now()); // Set the time for the first question
+        setStartTime(Date.now()); // Start timer for the first question
       }
       setLoading(false);
     };
@@ -42,7 +43,7 @@ export default function TakeQuiz() {
     setTimeout(() => {
       if (currentQ < questions.length - 1) {
         setCurrentQ(currentQ + 1);
-        setStartTime(Date.now()); // Reset timer for next question
+        setStartTime(Date.now()); // Restart timer for next question
       } else {
         setQuizDone(true);
         submitAttempt(isCorrect ? correct + 1 : correct);
@@ -53,9 +54,16 @@ export default function TakeQuiz() {
   const submitAttempt = async (finalCorrect) => {
     const score = Math.round((finalCorrect / questions.length) * 100);
     console.log({ score, timestamps });
+
+    // 🔐 Ensure CSRF token is valid
+    await fetch("/api/csrf/restore", { credentials: "include" });
+
     const res = await fetch(`/api/quizzes/${quizId}/attempt`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrf_token"),
+      },
       credentials: "include",
       body: JSON.stringify({ score, timestamps }),
     });
@@ -63,11 +71,13 @@ export default function TakeQuiz() {
     if (res.ok) {
       console.log("✅ Attempt submitted");
     } else {
-      console.error("❌ Failed to submit attempt");
+      const err = await res.json();
+      console.error("❌ Failed to submit attempt:", err);
     }
   };
 
   if (loading) return <p>Loading questions...</p>;
+
   if (!questions.length) {
     return (
       <div className="quiz-play-container">
@@ -82,7 +92,7 @@ export default function TakeQuiz() {
 
   if (quizDone) {
     const finalScore = Math.round((correct / questions.length) * 100);
-  
+
     return (
       <div className="quiz-complete-container">
         <h2>{finalScore === 100 ? "🎉 Perfect Score!" : "✅ Quiz Complete!"}</h2>
