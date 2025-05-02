@@ -9,18 +9,16 @@ from app.models.quiz_attempt import QuizAttempt
 classroom_routes = Blueprint("classrooms", __name__)
 
 
-# ─── CREATE / READ / UPDATE / DELETE CLASSROOM ─────────────────────────────────
+# ── CRUD CLASSROOM ──────────────────────────────────────────
 
 @classroom_routes.route("/", methods=["POST"])
 @login_required
 def create_classroom():
     if current_user.role != "instructor":
         return {"error": "Unauthorized"}, 403
-
     name = request.json.get("name", "").strip()
     if not name:
         return {"error": "Classroom name is required"}, 400
-
     cls = Classroom(name=name, instructor_id=current_user.id)
     db.session.add(cls)
     db.session.commit()
@@ -36,22 +34,12 @@ def get_classrooms():
     return jsonify([c.to_dict() for c in classes])
 
 
-@classroom_routes.route("/<int:classroom_id>", methods=["GET"])
-@login_required
-def get_single_classroom(classroom_id):
-    cls = Classroom.query.get_or_404(classroom_id)
-    if cls.instructor_id != current_user.id:
-        return {"error": "Unauthorized"}, 403
-    return jsonify(cls.to_dict())
-
-
 @classroom_routes.route("/<int:classroom_id>", methods=["PUT"])
 @login_required
 def update_classroom(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
-
     new_name = request.json.get("name", "").strip()
     if new_name:
         cls.name = new_name
@@ -65,13 +53,21 @@ def delete_classroom(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
-
     db.session.delete(cls)
     db.session.commit()
     return {"message": "Classroom deleted"}
 
 
-# ─── MANAGE STUDENTS ──────────────────────────────────────────────────────────
+@classroom_routes.route("/<int:classroom_id>", methods=["GET"])
+@login_required
+def get_single_classroom(classroom_id):
+    cls = Classroom.query.get_or_404(classroom_id)
+    if cls.instructor_id != current_user.id:
+        return {"error": "Unauthorized"}, 403
+    return jsonify(cls.to_dict())
+
+
+# ── STUDENT MANAGEMENT ─────────────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/students", methods=["POST"])
 @login_required
@@ -82,7 +78,7 @@ def modify_classroom_students(classroom_id):
 
     data = request.get_json()
     student_id = data.get("student_id")
-    action     = data.get("action")
+    action = data.get("action")
 
     student = User.query.get(student_id)
     if not student or student.role != "student":
@@ -101,7 +97,7 @@ def modify_classroom_students(classroom_id):
     return jsonify(cls.to_dict())
 
 
-# ─── TOGGLE QUIZ FOR FULL CLASS ──────────────────────────────────────────────
+# ── CLASS QUIZ ASSIGNMENTS ─────────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assign-quiz", methods=["POST"])
 @login_required
@@ -109,14 +105,12 @@ def toggle_quiz_assignment_to_classroom(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
-
     quiz_id = request.json.get("quiz_id")
     if not quiz_id:
         return {"error": "Quiz ID required"}, 400
 
     existing = ClassroomQuiz.query.filter_by(
-        classroom_id=classroom_id,
-        quiz_id=quiz_id
+        classroom_id=classroom_id, quiz_id=quiz_id
     ).first()
 
     if existing:
@@ -124,26 +118,22 @@ def toggle_quiz_assignment_to_classroom(classroom_id):
         db.session.commit()
         return {"message": "Quiz unassigned from class"}, 200
     else:
-        new_assignment = ClassroomQuiz(
-            classroom_id=classroom_id,
-            quiz_id=quiz_id
-        )
-        db.session.add(new_assignment)
+        db.session.add(ClassroomQuiz(classroom_id=classroom_id, quiz_id=quiz_id))
         db.session.commit()
         return {"message": "Quiz assigned to class"}, 201
 
 
-# ─── ASSIGN QUIZ TO INDIVIDUAL STUDENT ───────────────────────────────────────
+# ── INDIVIDUAL STUDENT ASSIGNMENT TOGGLE ───────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assign-quiz-to-student", methods=["POST"])
 @login_required
-def assign_quiz_to_student(classroom_id):
+def toggle_quiz_assignment_to_student(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
 
-    data       = request.get_json()
-    quiz_id    = data.get("quiz_id")
+    data = request.get_json()
+    quiz_id = data.get("quiz_id")
     student_id = data.get("student_id")
 
     if not quiz_id or not student_id:
@@ -155,27 +145,27 @@ def assign_quiz_to_student(classroom_id):
     if student not in cls.students:
         return {"error": "Student is not in this classroom"}, 400
 
-    # prevent duplicate assignment
     existing = QuizAttempt.query.filter_by(
-        user_id=student_id,
-        quiz_id=quiz_id,
-        status="assigned"
+        user_id=student_id, quiz_id=quiz_id, status="assigned"
     ).first()
-    if existing:
-        return {"error": "Already assigned to that student"}, 400
 
-    attempt = QuizAttempt(
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
+        return {"message": "Unassigned from student"}, 200
+
+    new_attempt = QuizAttempt(
         user_id=student_id,
         quiz_id=quiz_id,
-        score=0,
-        status="assigned"
+        status="assigned",
+        score=0
     )
-    db.session.add(attempt)
+    db.session.add(new_attempt)
     db.session.commit()
-    return {"message": "Quiz assigned to student"}, 201
+    return {"message": "Assigned to student"}, 201
 
 
-# ─── GET CLASSROOM ASSIGNMENT DATA ───────────────────────────────────────────
+# ── FETCH CLASSROOM ASSIGNMENTS ────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assignments", methods=["GET"])
 @login_required
@@ -184,26 +174,22 @@ def get_classroom_quiz_assignments(classroom_id):
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
 
-    # 1️⃣ Class-level assignments
-    class_qs = ClassroomQuiz.query.filter_by(classroom_id=classroom_id).all()
-    class_assigned_quiz_ids = [cq.quiz_id for cq in class_qs]
+    class_assigned_quiz_ids = [
+        cq.quiz_id for cq in ClassroomQuiz.query.filter_by(classroom_id=classroom_id)
+    ]
 
-    # 2️⃣ Per-student assignments
-    student_assignments = {}         # { student_id: [quiz_id, ...] }
-    student_names_by_quiz = {}       # { quiz_id: [username, ...] }
+    student_assignments = {}
+    student_names_by_quiz = {}
 
     for student in cls.students:
         attempts = QuizAttempt.query.filter_by(
-            user_id=student.id,
-            status="assigned"
+            user_id=student.id, status="assigned"
         ).all()
-
         student_assignments[str(student.id)] = [a.quiz_id for a in attempts]
-
-        for attempt in attempts:
-            if attempt.quiz_id not in student_names_by_quiz:
-                student_names_by_quiz[attempt.quiz_id] = []
-            student_names_by_quiz[attempt.quiz_id].append(student.username)
+        for a in attempts:
+            if a.quiz_id not in student_names_by_quiz:
+                student_names_by_quiz[a.quiz_id] = []
+            student_names_by_quiz[a.quiz_id].append(student.username)
 
     return jsonify({
         "class_assigned_quiz_ids": class_assigned_quiz_ids,

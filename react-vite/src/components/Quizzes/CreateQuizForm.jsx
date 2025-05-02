@@ -1,5 +1,8 @@
+// react-vite/src/components/Quizzes/CreateQuizForm.jsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../../utils/csrf"; // ✅ Add this import
 import "./CreateQuizForm.css";
 
 export default function CreateQuizForm() {
@@ -15,9 +18,15 @@ export default function CreateQuizForm() {
     setErrors([]);
     setSuccess(false);
 
+    // 🔁 Always restore CSRF before POST
+    await fetch("/api/csrf/restore", { credentials: "include" });
+
     const res = await fetch("/api/quizzes/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrf_token"), // ✅ Add this
+      },
       credentials: "include",
       body: JSON.stringify({
         title,
@@ -32,8 +41,12 @@ export default function CreateQuizForm() {
       setGradeLevel("");
       setSuccess(true);
     } else {
-      const data = await res.json();
-      setErrors(data.errors || [data.error || "Something went wrong"]);
+      try {
+        const data = await res.json();
+        setErrors(data.errors || [data.error || "Something went wrong"]);
+      } catch {
+        setErrors(["Unexpected error occurred. Please try again."]);
+      }
     }
   };
 

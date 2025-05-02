@@ -1,5 +1,4 @@
-// react-vite/src/components/Dashboard/AssignQuizPage.jsx
-
+// src/components/Dashboard/AssignQuizPage.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -80,7 +79,7 @@ export default function AssignQuizPage() {
     }
   };
 
-  const handleAssignToStudent = async (studentId) => {
+  const handleToggleStudentAssignment = async (studentId) => {
     await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch(`/api/classrooms/${classroomId}/assign-quiz-to-student`, {
@@ -97,15 +96,13 @@ export default function AssignQuizPage() {
     });
 
     if (res.ok) {
-      toast.success("🎯 Assigned to student!");
+      const msg = await res.json();
+      toast.success(`🎯 ${msg.message}`);
       await fetchAssignments();
     } else {
       const err = await res.json();
-      toast.error(err.error || "❌ Failed to assign.");
+      toast.error(err.error || "❌ Failed to assign/unassign");
     }
-
-    setShowStudentModal(false);
-    setSelectedQuizId(null);
   };
 
   if (loading) return <p>Loading quizzes...</p>;
@@ -171,17 +168,20 @@ export default function AssignQuizPage() {
               ❌ Close
             </button>
             <ul className="student-list">
-              {students.map((student) => (
-                <li key={student.id}>
-                  {student.username}
-                  <button
-                    onClick={() => handleAssignToStudent(student.id)}
-                    className="assign-btn-small"
-                  >
-                    ➕ Assign
-                  </button>
-                </li>
-              ))}
+              {students.map((student) => {
+                const assigned = studentAssignments[student.id]?.includes(selectedQuizId);
+                return (
+                  <li key={student.id}>
+                    {student.username}
+                    <button
+                      onClick={() => handleToggleStudentAssignment(student.id)}
+                      className="assign-btn-small"
+                    >
+                      {assigned ? "❌ Unassign" : "➕ Assign"}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
