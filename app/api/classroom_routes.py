@@ -101,11 +101,11 @@ def modify_classroom_students(classroom_id):
     return jsonify(cls.to_dict())
 
 
-# ─── ASSIGN QUIZ TO CLASS ─────────────────────────────────────────────────────
+# ─── TOGGLE ASSIGN/UNASSIGN QUIZ TO CLASS ─────────────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assign-quiz", methods=["POST"])
 @login_required
-def assign_quiz_to_classroom(classroom_id):
+def toggle_assign_quiz_to_classroom(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
@@ -114,20 +114,23 @@ def assign_quiz_to_classroom(classroom_id):
     if not quiz_id:
         return {"error": "Quiz ID required"}, 400
 
-    exists = ClassroomQuiz.query.filter_by(
+    existing = ClassroomQuiz.query.filter_by(
         classroom_id=classroom_id,
         quiz_id=quiz_id
     ).first()
-    if exists:
-        return {"error": "Quiz already assigned"}, 400
 
-    assignment = ClassroomQuiz(
-        classroom_id=classroom_id,
-        quiz_id=quiz_id
-    )
-    db.session.add(assignment)
-    db.session.commit()
-    return {"message": "Quiz assigned to class!"}, 201
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
+        return {"message": "Quiz unassigned from class"}, 200
+    else:
+        assignment = ClassroomQuiz(
+            classroom_id=classroom_id,
+            quiz_id=quiz_id
+        )
+        db.session.add(assignment)
+        db.session.commit()
+        return {"message": "Quiz assigned to class"}, 201
 
 
 # ─── ASSIGN QUIZ TO STUDENT ───────────────────────────────────────────────────
@@ -146,25 +149,23 @@ def assign_quiz_to_student(classroom_id):
     if not quiz_id or not student_id:
         return {"error": "Missing quiz_id or student_id"}, 400
 
-    # prevent dupes
     already = QuizAttempt.query.filter_by(
-      user_id=student_id,
-      quiz_id=quiz_id,
-      status="assigned"
+        user_id=student_id,
+        quiz_id=quiz_id,
+        status="assigned"
     ).first()
     if already:
         return {"error": "Already assigned to that student"}, 400
 
-    # give them a "blank" attempt with default score=0
     assignment = QuizAttempt(
-      user_id= student_id,
-      quiz_id=  quiz_id,
-      status=   "assigned",
-      score=    0
+        user_id= student_id,
+        quiz_id= quiz_id,
+        status=  "assigned",
+        score=   0
     )
     db.session.add(assignment)
     db.session.commit()
-    return {"message": "Quiz assigned to student!"}, 201
+    return {"message": "Quiz assigned to student"}, 201
 
 
 # ─── GET ALL ASSIGNMENTS ──────────────────────────────────────────────────────
@@ -176,21 +177,30 @@ def get_all_assignments(classroom_id):
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
 
-    # 1️⃣ Class-wide
     class_qs = ClassroomQuiz.query.filter_by(classroom_id=classroom_id).all()
     class_assigned = [cq.quiz_id for cq in class_qs]
 
-    # 2️⃣ Per-student (only “assigned” not yet completed)
     student_assignments = {}
+    student_names_by_quiz = {}
+
     for st in cls.students:
         attempts = QuizAttempt.query.filter_by(
             user_id=st.id,
             status="assigned"
         ).all()
-        student_assignments[str(st.id)] = [a.quiz_id for a in attempts]
-    # → keys must be strings, so your front-end can do .includes()
+
+        for a in attempts:
+            qid = str(a.quiz_id)
+            if qid not in student_names_by_quiz:
+                student_names_by_quiz[qid] = []
+            student_names_by_quiz[qid].append(st.username)
+
+            if str(st.id) not in student_assignments:
+                student_assignments[str(st.id)] = []
+            student_assignments[str(st.id)].append(a.quiz_id)
 
     return jsonify({
         "class_assigned_quiz_ids": class_assigned,
-        "student_assignments":    student_assignments
+        "student_assignments": student_assignments,
+        "student_names_by_quiz": student_names_by_quiz
     })

@@ -1,6 +1,9 @@
+// react-vite/src/components/Dashboard/AssignQuizPage.jsx
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getCookie } from "../../utils/csrf";
 import "./AssignQuizPage.css";
 
 export default function AssignQuizPage() {
@@ -16,10 +19,15 @@ export default function AssignQuizPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchQuizzes();
-    fetchStudents();
-    fetchAssignments();
+    fetchAllData();
   }, []);
+
+  const fetchAllData = async () => {
+    await fetchQuizzes();
+    await fetchStudents();
+    await fetchAssignments();
+    setLoading(false);
+  };
 
   const fetchQuizzes = async () => {
     const res = await fetch("/api/quizzes/", { credentials: "include" });
@@ -39,36 +47,47 @@ export default function AssignQuizPage() {
 
   const fetchAssignments = async () => {
     const res = await fetch(`/api/classrooms/${classroomId}/assignments`, {
-      credentials: "include"
+      credentials: "include",
     });
     if (res.ok) {
       const data = await res.json();
       setClassAssignedQuizIds(new Set(data.class_assigned_quiz_ids));
       setStudentAssignments(data.student_assignments);
     }
-    setLoading(false);
   };
 
-  const handleAssignToClass = async (quizId) => {
+  const handleToggleAssignToClass = async (quizId) => {
+    const alreadyAssigned = classAssignedQuizIds.has(quizId);
+    await fetch("/api/csrf/restore", { credentials: "include" });
+
     const res = await fetch(`/api/classrooms/${classroomId}/assign-quiz`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrf_token"),
+      },
       credentials: "include",
-      body: JSON.stringify({ quiz_id: quizId }),
+      body: JSON.stringify({ quiz_id: quizId, action: alreadyAssigned ? "unassign" : "assign" }),
     });
 
     if (res.ok) {
-      toast.success("🎯 Assigned to full class!");
+      toast.success(alreadyAssigned ? "❌ Unassigned from class!" : "✅ Assigned to class!");
       await fetchAssignments();
     } else {
-      toast.error("❌ Failed to assign quiz.");
+      const data = await res.json();
+      toast.error(data.error || "❌ Failed to update assignment.");
     }
   };
 
   const handleAssignToStudent = async (studentId) => {
+    await fetch("/api/csrf/restore", { credentials: "include" });
+
     const res = await fetch(`/api/classrooms/${classroomId}/assign-quiz-to-student`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrf_token"),
+      },
       credentials: "include",
       body: JSON.stringify({
         quiz_id: selectedQuizId,
@@ -80,7 +99,8 @@ export default function AssignQuizPage() {
       toast.success("🎯 Assigned to student!");
       await fetchAssignments();
     } else {
-      toast.error("❌ Failed to assign.");
+      const data = await res.json();
+      toast.error(data.error || "❌ Failed to assign.");
     }
 
     setShowStudentModal(false);
@@ -93,10 +113,7 @@ export default function AssignQuizPage() {
     <div className="assign-quiz-page">
       <h1>📝 Assign Quizzes</h1>
 
-      <button
-        className="back-button"
-        onClick={() => navigate("/dashboard/instructor/classrooms")}
-      >
+      <button className="back-button" onClick={() => navigate("/dashboard/instructor/classrooms")}>
         🔙 Back to Classrooms
       </button>
 
@@ -118,11 +135,10 @@ export default function AssignQuizPage() {
 
               <div className="quiz-buttons">
                 <button
-                  disabled={assignedToClass}
-                  onClick={() => handleAssignToClass(quiz.id)}
+                  onClick={() => handleToggleAssignToClass(quiz.id)}
                   className={`assign-btn ${assignedToClass ? "assigned" : ""}`}
                 >
-                  {assignedToClass ? "✅ Assigned to Class" : "🏫 Assign to Class"}
+                  {assignedToClass ? "❌ Unassign from Class" : "🏫 Assign to Class"}
                 </button>
 
                 <button
