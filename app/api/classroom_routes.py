@@ -101,11 +101,11 @@ def modify_classroom_students(classroom_id):
     return jsonify(cls.to_dict())
 
 
-# ─── TOGGLE ASSIGN/UNASSIGN QUIZ TO CLASS ─────────────────────────────────────
+# ─── TOGGLE QUIZ FOR FULL CLASS ──────────────────────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assign-quiz", methods=["POST"])
 @login_required
-def toggle_assign_quiz_to_classroom(classroom_id):
+def toggle_quiz_assignment_to_classroom(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
@@ -124,16 +124,16 @@ def toggle_assign_quiz_to_classroom(classroom_id):
         db.session.commit()
         return {"message": "Quiz unassigned from class"}, 200
     else:
-        assignment = ClassroomQuiz(
+        new_assignment = ClassroomQuiz(
             classroom_id=classroom_id,
             quiz_id=quiz_id
         )
-        db.session.add(assignment)
+        db.session.add(new_assignment)
         db.session.commit()
         return {"message": "Quiz assigned to class"}, 201
 
 
-# ─── ASSIGN QUIZ TO STUDENT ───────────────────────────────────────────────────
+# ─── ASSIGN QUIZ TO INDIVIDUAL STUDENT ───────────────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assign-quiz-to-student", methods=["POST"])
 @login_required
@@ -149,58 +149,64 @@ def assign_quiz_to_student(classroom_id):
     if not quiz_id or not student_id:
         return {"error": "Missing quiz_id or student_id"}, 400
 
-    already = QuizAttempt.query.filter_by(
+    student = User.query.get(student_id)
+    if not student or student.role != "student":
+        return {"error": "Invalid student"}, 400
+    if student not in cls.students:
+        return {"error": "Student is not in this classroom"}, 400
+
+    # prevent duplicate assignment
+    existing = QuizAttempt.query.filter_by(
         user_id=student_id,
         quiz_id=quiz_id,
         status="assigned"
     ).first()
-    if already:
+    if existing:
         return {"error": "Already assigned to that student"}, 400
 
-    assignment = QuizAttempt(
-        user_id= student_id,
-        quiz_id= quiz_id,
-        status=  "assigned",
-        score=   0
+    attempt = QuizAttempt(
+        user_id=student_id,
+        quiz_id=quiz_id,
+        score=0,
+        status="assigned"
     )
-    db.session.add(assignment)
+    db.session.add(attempt)
     db.session.commit()
     return {"message": "Quiz assigned to student"}, 201
 
 
-# ─── GET ALL ASSIGNMENTS ──────────────────────────────────────────────────────
+# ─── GET CLASSROOM ASSIGNMENT DATA ───────────────────────────────────────────
 
 @classroom_routes.route("/<int:classroom_id>/assignments", methods=["GET"])
 @login_required
-def get_all_assignments(classroom_id):
+def get_classroom_quiz_assignments(classroom_id):
     cls = Classroom.query.get_or_404(classroom_id)
     if cls.instructor_id != current_user.id:
         return {"error": "Unauthorized"}, 403
 
+    # 1️⃣ Class-level assignments
     class_qs = ClassroomQuiz.query.filter_by(classroom_id=classroom_id).all()
-    class_assigned = [cq.quiz_id for cq in class_qs]
+    class_assigned_quiz_ids = [cq.quiz_id for cq in class_qs]
 
-    student_assignments = {}
-    student_names_by_quiz = {}
+    # 2️⃣ Per-student assignments
+    student_assignments = {}         # { student_id: [quiz_id, ...] }
+    student_names_by_quiz = {}       # { quiz_id: [username, ...] }
 
-    for st in cls.students:
+    for student in cls.students:
         attempts = QuizAttempt.query.filter_by(
-            user_id=st.id,
+            user_id=student.id,
             status="assigned"
         ).all()
 
-        for a in attempts:
-            qid = str(a.quiz_id)
-            if qid not in student_names_by_quiz:
-                student_names_by_quiz[qid] = []
-            student_names_by_quiz[qid].append(st.username)
+        student_assignments[str(student.id)] = [a.quiz_id for a in attempts]
 
-            if str(st.id) not in student_assignments:
-                student_assignments[str(st.id)] = []
-            student_assignments[str(st.id)].append(a.quiz_id)
+        for attempt in attempts:
+            if attempt.quiz_id not in student_names_by_quiz:
+                student_names_by_quiz[attempt.quiz_id] = []
+            student_names_by_quiz[attempt.quiz_id].append(student.username)
 
     return jsonify({
-        "class_assigned_quiz_ids": class_assigned,
+        "class_assigned_quiz_ids": class_assigned_quiz_ids,
         "student_assignments": student_assignments,
         "student_names_by_quiz": student_names_by_quiz
     })

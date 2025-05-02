@@ -14,6 +14,7 @@ export default function AssignQuizPage() {
   const [students, setStudents] = useState([]);
   const [classAssignedQuizIds, setClassAssignedQuizIds] = useState(new Set());
   const [studentAssignments, setStudentAssignments] = useState({});
+  const [studentNamesByQuiz, setStudentNamesByQuiz] = useState({});
   const [selectedQuizId, setSelectedQuizId] = useState(null);
   const [showStudentModal, setShowStudentModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -23,18 +24,17 @@ export default function AssignQuizPage() {
   }, []);
 
   const fetchAllData = async () => {
-    await fetchQuizzes();
-    await fetchStudents();
-    await fetchAssignments();
+    await Promise.all([
+      fetchQuizzes(),
+      fetchStudents(),
+      fetchAssignments(),
+    ]);
     setLoading(false);
   };
 
   const fetchQuizzes = async () => {
     const res = await fetch("/api/quizzes/", { credentials: "include" });
-    if (res.ok) {
-      const data = await res.json();
-      setAllQuizzes(data);
-    }
+    if (res.ok) setAllQuizzes(await res.json());
   };
 
   const fetchStudents = async () => {
@@ -53,11 +53,11 @@ export default function AssignQuizPage() {
       const data = await res.json();
       setClassAssignedQuizIds(new Set(data.class_assigned_quiz_ids));
       setStudentAssignments(data.student_assignments);
+      setStudentNamesByQuiz(data.student_names_by_quiz || {});
     }
   };
 
-  const handleToggleAssignToClass = async (quizId) => {
-    const alreadyAssigned = classAssignedQuizIds.has(quizId);
+  const handleToggleClassAssignment = async (quizId) => {
     await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch(`/api/classrooms/${classroomId}/assign-quiz`, {
@@ -67,15 +67,16 @@ export default function AssignQuizPage() {
         "X-CSRFToken": getCookie("csrf_token"),
       },
       credentials: "include",
-      body: JSON.stringify({ quiz_id: quizId, action: alreadyAssigned ? "unassign" : "assign" }),
+      body: JSON.stringify({ quiz_id: quizId }),
     });
 
     if (res.ok) {
-      toast.success(alreadyAssigned ? "❌ Unassigned from class!" : "✅ Assigned to class!");
+      const { message } = await res.json();
+      toast.success(`✅ ${message}`);
       await fetchAssignments();
     } else {
-      const data = await res.json();
-      toast.error(data.error || "❌ Failed to update assignment.");
+      const err = await res.json();
+      toast.error(err.error || "❌ Failed to toggle assignment");
     }
   };
 
@@ -99,8 +100,8 @@ export default function AssignQuizPage() {
       toast.success("🎯 Assigned to student!");
       await fetchAssignments();
     } else {
-      const data = await res.json();
-      toast.error(data.error || "❌ Failed to assign.");
+      const err = await res.json();
+      toast.error(err.error || "❌ Failed to assign.");
     }
 
     setShowStudentModal(false);
@@ -113,20 +114,17 @@ export default function AssignQuizPage() {
     <div className="assign-quiz-page">
       <h1>📝 Assign Quizzes</h1>
 
-      <button className="back-button" onClick={() => navigate("/dashboard/instructor/classrooms")}>
+      <button
+        className="back-button"
+        onClick={() => navigate("/dashboard/instructor/classrooms")}
+      >
         🔙 Back to Classrooms
       </button>
 
       <div className="quiz-list">
         {allQuizzes.map((quiz) => {
           const assignedToClass = classAssignedQuizIds.has(quiz.id);
-          const assignedToStudents = Object.entries(studentAssignments)
-            .filter(([_, quizIds]) => quizIds.includes(quiz.id))
-            .map(([studentId]) => {
-              const student = students.find((s) => s.id === parseInt(studentId));
-              return student ? student.username : null;
-            })
-            .filter(Boolean);
+          const assignedStudents = studentNamesByQuiz[quiz.id] || [];
 
           return (
             <div key={quiz.id} className="quiz-card">
@@ -135,10 +133,10 @@ export default function AssignQuizPage() {
 
               <div className="quiz-buttons">
                 <button
-                  onClick={() => handleToggleAssignToClass(quiz.id)}
+                  onClick={() => handleToggleClassAssignment(quiz.id)}
                   className={`assign-btn ${assignedToClass ? "assigned" : ""}`}
                 >
-                  {assignedToClass ? "❌ Unassign from Class" : "🏫 Assign to Class"}
+                  {assignedToClass ? "✅ Unassign from Class" : "🏫 Assign to Class"}
                 </button>
 
                 <button
@@ -152,9 +150,9 @@ export default function AssignQuizPage() {
                 </button>
               </div>
 
-              {assignedToStudents.length > 0 && !assignedToClass && (
+              {assignedStudents.length > 0 && (
                 <p className="assigned-to">
-                  Assigned to: {assignedToStudents.join(", ")}
+                  Assigned to: {assignedStudents.join(", ")}
                 </p>
               )}
             </div>
@@ -166,7 +164,12 @@ export default function AssignQuizPage() {
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Select a Student</h2>
-            <button className="close-modal" onClick={() => setShowStudentModal(false)}>❌ Close</button>
+            <button
+              className="close-modal"
+              onClick={() => setShowStudentModal(false)}
+            >
+              ❌ Close
+            </button>
             <ul className="student-list">
               {students.map((student) => (
                 <li key={student.id}>
