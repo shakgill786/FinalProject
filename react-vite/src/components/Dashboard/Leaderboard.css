@@ -88,6 +88,24 @@
   animation: glowBronze 2s infinite alternate;
 }
 
+.your-rank-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #fef9c3;
+  border: 2px dashed #facc15;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1rem;
+  color: #7c3aed;
+  box-shadow: 0 0 12px rgba(252, 211, 77, 0.3);
+}
+
+.your-rank-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #ca8a04;
+}
+
 @keyframes glowGold {
   from { box-shadow: 0 0 10px gold; }
   to { box-shadow: 0 0 20px gold; }

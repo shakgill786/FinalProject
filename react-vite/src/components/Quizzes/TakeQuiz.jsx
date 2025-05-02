@@ -21,12 +21,19 @@ export default function TakeQuiz() {
       if (res.ok) {
         const data = await res.json();
         setQuestions(data);
-        setStartTime(Date.now()); // Start timer for the first question
+        setStartTime(Date.now());
       }
       setLoading(false);
     };
     fetchQuestions();
   }, [quizId]);
+
+  useEffect(() => {
+    if (quizDone && timestamps.length === questions.length) {
+      const finalScore = Math.round((correct / questions.length) * 100);
+      submitAttempt(finalScore);
+    }
+  }, [quizDone, timestamps]);
 
   const handleAnswer = (option) => {
     const isCorrect = option === questions[currentQ].answer;
@@ -38,24 +45,27 @@ export default function TakeQuiz() {
 
     const endTime = Date.now();
     const elapsedSeconds = (endTime - startTime) / 1000;
+    console.log(`⏱️ Q${currentQ + 1} time: ${elapsedSeconds.toFixed(2)}s`);
     setTimestamps((prev) => [...prev, elapsedSeconds]);
 
     setTimeout(() => {
       if (currentQ < questions.length - 1) {
         setCurrentQ(currentQ + 1);
-        setStartTime(Date.now()); // Restart timer for next question
+        setStartTime(Date.now());
       } else {
-        setQuizDone(true);
-        submitAttempt(isCorrect ? correct + 1 : correct);
+        setQuizDone(true); // ⏱️ triggers submission via useEffect
       }
     }, 700);
   };
 
-  const submitAttempt = async (finalCorrect) => {
-    const score = Math.round((finalCorrect / questions.length) * 100);
+  const submitAttempt = async (score) => {
+    if (!timestamps.length || timestamps.length !== questions.length) {
+      console.warn("⚠️ Incomplete or missing timestamps. Attempt not submitted.");
+      return;
+    }
+
     console.log({ score, timestamps });
 
-    // 🔐 Ensure CSRF token is valid
     await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch(`/api/quizzes/${quizId}/attempt`, {

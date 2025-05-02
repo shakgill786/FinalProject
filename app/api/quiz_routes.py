@@ -227,7 +227,17 @@ def leaderboard():
     .limit(10) \
     .all()
 
-    return jsonify([
-        {"user_id": uid, "username": name, "total_points": int(tp or 0)}
-        for uid, name, tp in results
-    ]), 200
+@quiz_routes.route("/me/points", methods=["GET"])
+@login_required
+def get_my_points():
+    if current_user.role != "student":
+        return {"error": "Unauthorized"}, 403
+
+    total = db.session.query(func.sum(QuizAttempt.points)) \
+        .filter_by(user_id=current_user.id) \
+        .scalar()
+
+    return jsonify({
+        "username": current_user.username,
+        "total_points": int(total or 0)
+    }), 200
