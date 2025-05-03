@@ -8,6 +8,7 @@ export default function TakeQuiz() {
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [correct, setCorrect] = useState(0);
+  const [pointsEarned, setPointsEarned] = useState([]); // 💥 NEW: store live points
   const [showConfetti, setShowConfetti] = useState(false);
   const [loading, setLoading] = useState(true);
   const [timestamps, setTimestamps] = useState([]);
@@ -28,42 +29,41 @@ export default function TakeQuiz() {
     fetchQuestions();
   }, [quizId]);
 
-  useEffect(() => {
-    if (quizDone && timestamps.length === questions.length) {
-      const finalScore = Math.round((correct / questions.length) * 100);
-      submitAttempt(finalScore);
-    }
-  }, [quizDone, timestamps]);
-
   const handleAnswer = (option) => {
     const isCorrect = option === questions[currentQ].answer;
+    const endTime = Date.now();
+    const elapsedSeconds = (endTime - startTime) / 1000;
+    const points = isCorrect
+      ? elapsedSeconds <= 2
+        ? 10
+        : elapsedSeconds <= 5
+        ? 5
+        : 2
+      : 0;
+
+    setTimestamps((prev) => [...prev, elapsedSeconds]);
+    setPointsEarned((prev) => [...prev, points]);
+
     if (isCorrect) {
       setCorrect((prev) => prev + 1);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 500);
     }
 
-    const endTime = Date.now();
-    const elapsedSeconds = (endTime - startTime) / 1000;
-    console.log(`⏱️ Q${currentQ + 1} time: ${elapsedSeconds.toFixed(2)}s`);
-    setTimestamps((prev) => [...prev, elapsedSeconds]);
-
     setTimeout(() => {
       if (currentQ < questions.length - 1) {
         setCurrentQ(currentQ + 1);
         setStartTime(Date.now());
       } else {
-        setQuizDone(true); // ⏱️ triggers submission via useEffect
+        setQuizDone(true);
+        submitAttempt(isCorrect ? correct + 1 : correct, [...pointsEarned, points]);
       }
     }, 700);
   };
 
-  const submitAttempt = async (score) => {
-    if (!timestamps.length || timestamps.length !== questions.length) {
-      console.warn("⚠️ Incomplete or missing timestamps. Attempt not submitted.");
-      return;
-    }
-
+  const submitAttempt = async (finalCorrect, finalPointsArray) => {
+    const score = Math.round((finalCorrect / questions.length) * 100);
+    const totalPoints = finalPointsArray.reduce((a, b) => a + b, 0);
     console.log({ score, timestamps });
 
     await fetch("/api/csrf/restore", { credentials: "include" });
@@ -75,11 +75,12 @@ export default function TakeQuiz() {
         "X-CSRFToken": getCookie("csrf_token"),
       },
       credentials: "include",
-      body: JSON.stringify({ score, timestamps }),
+      body: JSON.stringify({ score, timestamps, points: finalPointsArray }),
     });
 
     if (res.ok) {
       console.log("✅ Attempt submitted");
+      setTimeout(() => navigate("/leaderboard"), 4000);
     } else {
       const err = await res.json();
       console.error("❌ Failed to submit attempt:", err);
@@ -102,22 +103,50 @@ export default function TakeQuiz() {
 
   if (quizDone) {
     const finalScore = Math.round((correct / questions.length) * 100);
+    const totalPoints = pointsEarned.reduce((a, b) => a + b, 0);
+    const avgTime = timestamps.reduce((sum, t) => sum + t, 0) / timestamps.length;
+
+    const earnedBadges = [];
+    if (finalScore === 100) earnedBadges.push("🧠 Accuracy Ace");
+    if (avgTime <= 2) earnedBadges.push("⚡ Fast Thinker");
 
     return (
       <div className="quiz-complete-container">
         <h2>{finalScore === 100 ? "🎉 Perfect Score!" : "✅ Quiz Complete!"}</h2>
-        {finalScore === 100 && (
-          <img src="/celebrate.gif" alt="Celebration" />
-        )}
+        {finalScore === 100 && <img src="/celebrate.gif" alt="Celebration" />}
         <p>
           You got {correct} out of {questions.length} questions right ({finalScore}%)
         </p>
-        <button onClick={() => navigate("/")}>Back to Quizzes</button>
+        <p>🟢 Total Points Earned: {totalPoints}</p>
+
+        {earnedBadges.length > 0 ? (
+          <div className="earned-badges">
+            <h3>🏅 You Earned:</h3>
+            <ul>
+              {earnedBadges.map((badge, i) => (
+                <li key={i}>{badge}</li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p>No badges earned this time. Keep trying! 💪</p>
+        )}
+
+        <div className="badge-info">
+          <h4>📜 Badge Criteria</h4>
+          <ul>
+            <li>🧠 Accuracy Ace: Score 100% on a quiz</li>
+            <li>⚡ Fast Thinker: Average time per question ≤ 2 seconds</li>
+          </ul>
+        </div>
+
+        <p>🏁 Redirecting to leaderboard...</p>
       </div>
     );
   }
 
   const question = questions[currentQ];
+  const latestPoints = pointsEarned[pointsEarned.length - 1];
 
   return (
     <div className="quiz-play-container">
@@ -130,6 +159,9 @@ export default function TakeQuiz() {
           </button>
         ))}
       </div>
+      {latestPoints !== undefined && (
+        <p className="live-points">🟢 Points for last answer: {latestPoints}</p>
+      )}
       {showConfetti && <div className="confetti">🎉</div>}
     </div>
   );

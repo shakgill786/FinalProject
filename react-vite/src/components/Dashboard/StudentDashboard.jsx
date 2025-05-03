@@ -1,29 +1,42 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "./StudentDashboard.css";
 
 export default function StudentDashboard() {
   const sessionUser = useSelector((state) => state.session.user);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/quizzes/history", {
-      credentials: "include",
-    })
+    fetch("/api/quizzes/history", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         setHistory(data);
         setLoading(false);
-
-        if (data.length > 0) {
-          toast.success("🏅 New badge unlocked!");
-        }
       });
+  }, [refreshKey]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshHistory();
+      }
+    };
+
+    const interval = setInterval(refreshHistory, 60000); // Refresh every 60s
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
+
+  const refreshHistory = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   const totalPoints = history.reduce((sum, q) => sum + q.points, 0);
   const average = history.length
@@ -40,11 +53,12 @@ export default function StudentDashboard() {
     <div className="student-dashboard">
       <h1>🎓 Welcome back, {sessionUser.username}!</h1>
 
-      <button
-        className="leaderboard-btn"
-        onClick={() => navigate("/leaderboard")}
-      >
+      <button className="leaderboard-btn" onClick={() => navigate("/leaderboard")}>
         🧠 View Leaderboard
+      </button>
+
+      <button className="refresh-btn" onClick={refreshHistory}>
+        🔄 Refresh Dashboard
       </button>
 
       {loading ? (
@@ -60,9 +74,18 @@ export default function StudentDashboard() {
                 {history.map((quiz, idx) => (
                   <li key={idx} className="quiz-entry">
                     <strong>{quiz.title}</strong> - Score: {quiz.score}% - Taken on {quiz.date} - Points: {quiz.points}
+                    {quiz.badges?.length > 0 && (
+                      <div className="badges">
+                        {quiz.badges.map((badge, i) => (
+                          <span className="badge" key={i}>{badge}</span>
+                        ))}
+                      </div>
+                    )}
                     <button
                       className="retake-btn"
-                      onClick={() => navigate(`/quizzes/${quiz.id}`)}
+                      onClick={() => {
+                        navigate(`/quizzes/${quiz.id}`);
+                      }}
                     >
                       🔁 Retake
                     </button>
@@ -77,6 +100,8 @@ export default function StudentDashboard() {
             {history.length >= 1 && <p>⭐ First quiz completed</p>}
             {history.find((q) => q.score === 100) && <p>🏆 100% score badge</p>}
             {history.length >= 5 && <p>🔥 5 quizzes finished</p>}
+            <p>💡 Accuracy Ace = Score 100%</p>
+            <p>⚡ Fast Thinker = Avg. Points ≥ 70%</p>
           </section>
 
           <section className="performance-summary">

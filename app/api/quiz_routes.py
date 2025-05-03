@@ -182,7 +182,8 @@ def log_quiz_attempt(quiz_id):
     if score is None or not isinstance(timestamps, list):
         return {"error": "Missing score or timestamps"}, 400
 
-    total_points = sum(10 if t <= 2 else 5 if t <= 5 else 2 for t in timestamps)
+    points_list = data.get("points", [])
+    total_points = sum(points_list) if isinstance(points_list, list) else 0
     at = QuizAttempt(
         user_id=current_user.id,
         quiz_id=quiz_id,
@@ -199,17 +200,29 @@ def log_quiz_attempt(quiz_id):
 def get_student_history():
     if current_user.role != "student":
         return {"error": "Unauthorized"}, 403
+
     attempts = QuizAttempt.query \
         .filter_by(user_id=current_user.id) \
         .order_by(QuizAttempt.created_at.desc()) \
         .all()
-    history = [{
-        "id":     a.quiz.id,
-        "title":  a.quiz.title,
-        "score":  a.score,
-        "points": a.points,
-        "date":   a.created_at.strftime("%Y-%m-%d")
-    } for a in attempts]
+
+    history = []
+    for a in attempts:
+        badges = []
+        if a.score == 100:
+            badges.append("Accuracy Ace")
+        if a.points >= len(a.quiz.questions) * 7:  # 70% of max (10 * # questions)
+            badges.append("Fast Thinker")
+
+        history.append({
+            "id": a.quiz.id,
+            "title": a.quiz.title,
+            "score": a.score,
+            "points": a.points,
+            "date": a.created_at.strftime("%Y-%m-%d"),
+            "badges": badges
+        })
+
     return jsonify(history), 200
 
 
@@ -226,6 +239,11 @@ def leaderboard():
     .order_by(func.sum(QuizAttempt.points).desc()) \
     .limit(10) \
     .all()
+
+    return jsonify([
+        {"user_id": user_id, "username": username, "total_points": int(points or 0)}
+        for user_id, username, points in results
+    ]), 200
 
 @quiz_routes.route("/me/points", methods=["GET"])
 @login_required

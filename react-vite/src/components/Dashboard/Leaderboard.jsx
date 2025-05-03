@@ -1,5 +1,3 @@
-// react-vite/src/components/Dashboard/Leaderboard.jsx
-
 import { useEffect, useState } from "react";
 import "./Leaderboard.css";
 
@@ -7,18 +5,32 @@ export default function Leaderboard() {
   const [leaders, setLeaders] = useState([]);
   const [me, setMe] = useState(null);
 
-  useEffect(() => {
-    fetch("/api/quizzes/leaderboard", {
+  const fetchLeaderboard = async () => {
+    const res = await fetch("/api/quizzes/leaderboard", {
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setLeaders(data));
+    });
+    const data = await res.json();
+    setLeaders(data);
+  };
 
-    fetch("/api/quizzes/me/points", {
+  const fetchMyPoints = async () => {
+    const res = await fetch("/api/quizzes/me/points", {
       credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setMe(data));
+    });
+    const data = await res.json();
+    setMe(data);
+  };
+
+  useEffect(() => {
+    fetchLeaderboard();
+    fetchMyPoints();
+
+    const interval = setInterval(() => {
+      fetchLeaderboard();
+      fetchMyPoints();
+    }, 60000); // Auto-refresh every 60s
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
