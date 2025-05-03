@@ -7,11 +7,13 @@ import {
 } from "redux";
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
-import quizzesReducer from "./quizzes"; 
+import quizzesReducer from "./quizzes";
+import feedbackReducer from "./feedback"; // ✅ Import feedback reducer
 
 const rootReducer = combineReducers({
   session: sessionReducer,
   quizzes: quizzesReducer,
+  feedback: feedbackReducer, 
 });
 
 let enhancer;

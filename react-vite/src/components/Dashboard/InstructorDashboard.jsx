@@ -1,24 +1,28 @@
+// src/components/Dashboard/InstructorDashboard.jsx
+
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { getAllQuizzes, deleteQuizThunk } from "../../redux/quizzes";
+import GiveFeedbackForm from "../Quizzes/GiveFeedbackForm";
 import "./InstructorDashboard.css";
 
 export default function InstructorDashboard() {
   const dispatch = useDispatch();
   const sessionUser = useSelector((st) => st.session.user);
-  const quizzes     = useSelector((st) => Object.values(st.quizzes));
+  const quizzes = useSelector((st) => Object.values(st.quizzes));
   const [loading, setLoading] = useState(true);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(null);
 
   useEffect(() => {
-    if (!sessionUser) return; 
+    if (!sessionUser) return;
     if (sessionUser.role === "instructor") {
       dispatch(getAllQuizzes()).finally(() => setLoading(false));
     }
   }, [dispatch, sessionUser]);
 
   if (!sessionUser) return null;
-  if (loading)       return <p>Loading…</p>;
+  if (loading) return <p>Loading…</p>;
 
   return (
     <div className="dashboard-container">
@@ -59,6 +63,18 @@ export default function InstructorDashboard() {
                   }}
                   className="delete-quiz-button"
                 >🗑️ Delete</button>
+              </div>
+
+              <div className="feedback-form-toggle">
+                <button onClick={() =>
+                  setShowFeedbackForm((prev) => prev === q.id ? null : q.id)
+                }>
+                  {showFeedbackForm === q.id ? "❌ Hide Feedback" : "💬 Give Feedback"}
+                </button>
+
+                {showFeedbackForm === q.id && (
+                  <GiveFeedbackForm quizId={q.id} studentId={1} /> // ← Replace `1` with selected student ID logic
+                )}
               </div>
             </div>
           ))}

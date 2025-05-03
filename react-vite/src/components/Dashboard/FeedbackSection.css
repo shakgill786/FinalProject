@@ -1,0 +1,21 @@
+/* FeedbackSection.css */
+.feedback-section {
+    margin-top: 10px;
+    padding: 10px;
+    border-left: 3px solid #ccc;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  .feedback-entry {
+    margin-bottom: 8px;
+    padding: 6px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  .delete-feedback-btn {
+    margin-left: 10px;
+    color: red;
+    cursor: pointer;
+  }

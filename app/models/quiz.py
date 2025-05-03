@@ -17,7 +17,7 @@ class Quiz(db.Model):
     # New: relationship for quiz attempts
     quiz_attempts = db.relationship("QuizAttempt", back_populates="quiz", cascade="all, delete-orphan")
     classroom_assignments = db.relationship("ClassroomQuiz", back_populates="quiz", cascade="all, delete-orphan")
-
+    feedbacks = db.relationship("Feedback", back_populates="quiz", cascade="all, delete-orphan")
     def to_dict(self):
         return {
             "id": self.id,

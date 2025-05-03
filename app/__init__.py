@@ -10,24 +10,25 @@ from .api.auth_routes import auth_routes
 from .api.quiz_routes import quiz_routes
 from .api.classroom_routes import classroom_routes
 from .api.user_routes import user_routes
+from .api.feedback_routes import feedback_routes  # ✅ Correct path
 
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
 
-# Config
+# ─── Config ────────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///dev.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = None
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = False  # Set True in production
 
-# Init extensions
+# ─── Extensions ─────────────────────────────────────────────────────
 db.init_app(app)
 migrate = Migrate(app, db)
 CORS(app, supports_credentials=True)
 csrf = CSRFProtect()
 csrf.init_app(app)
 
-# Flask-Login
+# ─── Login Setup ────────────────────────────────────────────────────
 login_manager = LoginManager()
 login_manager.login_view = "auth.unauthorized"
 login_manager.init_app(app)
@@ -36,14 +37,15 @@ login_manager.init_app(app)
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-# Blueprints
+# ─── Register Blueprints ────────────────────────────────────────────
 app.register_blueprint(auth_routes, url_prefix="/api/auth")
 app.register_blueprint(quiz_routes, url_prefix="/api/quizzes")
 app.register_blueprint(classroom_routes, url_prefix="/api/classrooms")
 app.register_blueprint(user_routes, url_prefix="/api/users")
+app.register_blueprint(feedback_routes, url_prefix="/api/feedback")
 app.cli.add_command(seed_commands)
 
-# CSRF Token restore
+# ─── CSRF Token Restore ─────────────────────────────────────────────
 @app.route("/api/csrf/restore")
 def restore_csrf():
     response = jsonify({"message": "CSRF cookie set"})
@@ -56,7 +58,7 @@ def restore_csrf():
     )
     return response
 
-# React frontend
+# ─── React Frontend Fallback ────────────────────────────────────────
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
@@ -65,6 +67,7 @@ def serve_react(path):
         return app.send_static_file(path)
     return app.send_static_file('index.html')
 
+# ─── 404 Handler ─────────────────────────────────────────────────────
 @app.errorhandler(404)
 def not_found(e):
     return jsonify({"error": "Not found"}), 404

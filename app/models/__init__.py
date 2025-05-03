@@ -6,6 +6,7 @@ from .user import User
 from .classroom import Classroom
 from .classroom_students import ClassroomStudent
 from .classroom_quiz import ClassroomQuiz
+from .feedback import Feedback
 
 __all__ = [
     'db',

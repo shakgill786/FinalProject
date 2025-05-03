@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import "./StudentDashboard.css";
+import FeedbackSection from "../Dashboard/FeedbackSection";
+import GiveFeedbackForm from "../Quizzes/GiveFeedbackForm";
 
 export default function StudentDashboard() {
   const sessionUser = useSelector((state) => state.session.user);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showOlder, setShowOlder] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,24 +22,7 @@ export default function StudentDashboard() {
       });
   }, [refreshKey]);
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        refreshHistory();
-      }
-    };
-
-    const interval = setInterval(refreshHistory, 60000); // Refresh every 60s
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
-
-  const refreshHistory = () => {
-    setRefreshKey((prev) => prev + 1);
-  };
+  const refreshHistory = () => setRefreshKey((prev) => prev + 1);
 
   const totalPoints = history.reduce((sum, q) => sum + q.points, 0);
   const average = history.length
@@ -47,7 +33,10 @@ export default function StudentDashboard() {
     title: "N/A",
   });
 
-  if (!sessionUser || sessionUser.role !== "student") return null;
+  const recentQuizzes = history.slice(0, 5);
+  const olderQuizzes = history.slice(5);
+
+  if (!sessionUser) return null;
 
   return (
     <div className="student-dashboard">
@@ -55,10 +44,6 @@ export default function StudentDashboard() {
 
       <button className="leaderboard-btn" onClick={() => navigate("/leaderboard")}>
         🧠 View Leaderboard
-      </button>
-
-      <button className="refresh-btn" onClick={refreshHistory}>
-        🔄 Refresh Dashboard
       </button>
 
       {loading ? (
@@ -70,28 +55,64 @@ export default function StudentDashboard() {
             {history.length === 0 ? (
               <p>You haven’t completed any quizzes yet.</p>
             ) : (
-              <ul>
-                {history.map((quiz, idx) => (
-                  <li key={idx} className="quiz-entry">
-                    <strong>{quiz.title}</strong> - Score: {quiz.score}% - Taken on {quiz.date} - Points: {quiz.points}
-                    {quiz.badges?.length > 0 && (
-                      <div className="badges">
-                        {quiz.badges.map((badge, i) => (
-                          <span className="badge" key={i}>{badge}</span>
-                        ))}
-                      </div>
-                    )}
-                    <button
-                      className="retake-btn"
-                      onClick={() => {
-                        navigate(`/quizzes/${quiz.id}`);
-                      }}
-                    >
-                      🔁 Retake
+              <>
+                <ul>
+                  {recentQuizzes.map((quiz, idx) => (
+                    <li key={idx} className="quiz-entry">
+                      <strong>{quiz.title}</strong> – Score: {quiz.score}% – Taken on {quiz.date} – Points: {quiz.points}
+
+                      {quiz.badges?.length > 0 && (
+                        <div className="badges">
+                          {quiz.badges.map((badge, i) => (
+                            <span className="badge" key={i}>{badge}</span>
+                          ))}
+                        </div>
+                      )}
+
+                      <button className="retake-btn" onClick={() => navigate(`/quizzes/${quiz.id}`)}>
+                        🔁 Retake
+                      </button>
+
+                      <FeedbackSection studentId={quiz.student_id || sessionUser.id} quizId={quiz.id} />
+
+                      {sessionUser.role === "instructor" && (
+                        <GiveFeedbackForm
+                          studentId={quiz.student_id || sessionUser.id}
+                          quizId={quiz.id}
+                          onSuccess={refreshHistory}
+                        />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+
+                {olderQuizzes.length > 0 && (
+                  <>
+                    <button onClick={() => setShowOlder(!showOlder)} className="toggle-older-btn">
+                      {showOlder ? "🔽 Hide Older Attempts" : "🔼 View Older Attempts"}
                     </button>
-                  </li>
-                ))}
-              </ul>
+                    {showOlder && (
+                      <ul className="older-quizzes">
+                        {olderQuizzes.map((quiz, idx) => (
+                          <li key={idx} className="quiz-entry faded">
+                            <strong>{quiz.title}</strong> – Score: {quiz.score}% – Taken on {quiz.date} – Points: {quiz.points}
+                            {quiz.badges?.length > 0 && (
+                              <div className="badges">
+                                {quiz.badges.map((badge, i) => (
+                                  <span className="badge" key={i}>{badge}</span>
+                                ))}
+                              </div>
+                            )}
+                            <button className="retake-btn" onClick={() => navigate(`/quizzes/${quiz.id}`)}>
+                              🔁 Retake
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </>
             )}
           </section>
 
