@@ -11,7 +11,7 @@ class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     teacher_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=True)  # ✅ Now optional
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now())
 
@@ -30,5 +30,5 @@ class Feedback(db.Model):
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M"),
             "teacher_name": self.teacher.username if self.teacher else None,
             "student_name": self.student.username if self.student else None,
-            "quiz_title": self.quiz.title if self.quiz else None,
+            "quiz_title": self.quiz.title if self.quiz else "General" if self.quiz_id is None else None,
         }

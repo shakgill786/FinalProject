@@ -1,5 +1,3 @@
-# app/api/feedback_routes.py
-
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from app.models import db, Feedback, User, Quiz
@@ -19,10 +17,10 @@ def create_feedback():
 
     data = request.get_json() or {}
     student_id = data.get("student_id")
-    quiz_id = data.get("quiz_id")
+    quiz_id = data.get("quiz_id")  # Can be None for general feedback
     content = data.get("content", "").strip()
 
-    if not student_id or not quiz_id or not content:
+    if not student_id or not content:
         return {"error": "Missing required fields"}, 400
 
     feedback = Feedback(
@@ -44,13 +42,16 @@ def get_feedback_for_student(student_id):
         return {"error": "Unauthorized"}, 403
 
     feedbacks = Feedback.query.filter_by(student_id=student_id).order_by(Feedback.created_at.desc()).all()
+
     return jsonify([
         {
             "id": f.id,
             "content": f.content,
             "created_at": f.created_at.strftime("%Y-%m-%d %H:%M"),
             "teacher_name": f.teacher.username,
-            "quiz_title": f.quiz.title
+            "quiz_title": f.quiz.title if f.quiz else "General Feedback",
+            "quiz_id": f.quiz_id,
+            "student_id": f.student_id
         } for f in feedbacks
     ]), 200
 
