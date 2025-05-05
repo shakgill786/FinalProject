@@ -26,17 +26,13 @@ const removeFeedback = (feedbackId) => ({
 });
 
 // ─── THUNKS ──────────────────────────────────────
-
-// Fetch all feedback for a specific student
 export const thunkLoadFeedback = (studentId) => async (dispatch) => {
   try {
     const res = await fetch(`/api/feedback/student/${studentId}`, {
       credentials: "include",
     });
-
     if (!res.ok) throw res;
     const data = await res.json();
-
     dispatch(loadFeedback(data));
     return data;
   } catch (err) {
@@ -45,21 +41,16 @@ export const thunkLoadFeedback = (studentId) => async (dispatch) => {
   }
 };
 
-// Create feedback
 export const thunkCreateFeedback = (feedbackData) => async (dispatch) => {
   try {
     const res = await fetch("/api/feedback", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(feedbackData),
     });
-
     if (!res.ok) throw res;
     const data = await res.json();
-
     dispatch(addFeedback(data));
     return data;
   } catch (err) {
@@ -69,21 +60,16 @@ export const thunkCreateFeedback = (feedbackData) => async (dispatch) => {
   }
 };
 
-// Update feedback
 export const thunkUpdateFeedback = (feedbackId, content) => async (dispatch) => {
   try {
     const res = await fetch(`/api/feedback/${feedbackId}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ content }),
     });
-
     if (!res.ok) throw res;
     const data = await res.json();
-
     dispatch(updateFeedback(data));
     return data;
   } catch (err) {
@@ -93,16 +79,13 @@ export const thunkUpdateFeedback = (feedbackId, content) => async (dispatch) => 
   }
 };
 
-// Delete feedback
 export const thunkDeleteFeedback = (feedbackId) => async (dispatch) => {
   try {
     const res = await fetch(`/api/feedback/${feedbackId}`, {
       method: "DELETE",
       credentials: "include",
     });
-
     if (!res.ok) throw res;
-
     dispatch(removeFeedback(feedbackId));
     return true;
   } catch (err) {
@@ -124,21 +107,17 @@ export default function feedbackReducer(state = initialState, action) {
       });
       return newState;
     }
-
     case ADD_FEEDBACK: {
       return { ...state, [action.feedback.id]: action.feedback };
     }
-
     case UPDATE_FEEDBACK: {
       return { ...state, [action.feedback.id]: action.feedback };
     }
-
     case DELETE_FEEDBACK: {
       const newState = { ...state };
       delete newState[action.feedbackId];
       return newState;
     }
-
     default:
       return state;
   }

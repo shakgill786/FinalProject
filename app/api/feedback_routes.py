@@ -54,6 +54,23 @@ def get_feedback_for_student(student_id):
         } for f in feedbacks
     ]), 200
 
+# ─── READ FEEDBACK FOR A SPECIFIC QUIZ & STUDENT ──────────────────
+@feedback_routes.route("/quiz/<int:quiz_id>/student/<int:student_id>", methods=["GET"])
+@login_required
+def get_feedback_for_quiz_and_student(quiz_id, student_id):
+    if not is_teacher():
+        return {"error": "Unauthorized"}, 403
+
+    feedbacks = Feedback.query.filter_by(quiz_id=quiz_id, student_id=student_id).order_by(Feedback.created_at.desc()).all()
+    return jsonify([
+        {
+            "id": f.id,
+            "content": f.content,
+            "created_at": f.created_at.strftime("%Y-%m-%d %H:%M"),
+            "teacher_name": f.teacher.username
+        } for f in feedbacks
+    ]), 200
+
 # ─── UPDATE FEEDBACK ───────────────────────────────────────────────
 @feedback_routes.route("/<int:feedback_id>", methods=["PUT"])
 @login_required

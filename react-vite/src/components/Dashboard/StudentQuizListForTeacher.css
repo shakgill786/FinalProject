@@ -1,0 +1,52 @@
+/* src/components/Dashboard/StudentQuizListForTeacher.css */
+
+.quiz-list-teacher {
+    background-color: #fdfdfd;
+    border: 2px solid #dcdcdc;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .quiz-list-teacher h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #2a2a2a;
+  }
+  
+  .quiz-list-teacher ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .quiz-list-teacher li {
+    background-color: #fff;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .quiz-list-teacher button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .quiz-list-teacher button:hover {
+    background-color: #45a045;
+  }
+  

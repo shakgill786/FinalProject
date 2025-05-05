@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getCookie } from "../../utils/csrf";
+import FeedbackModal from "./FeedbackModal";
 import "./InstructorClassroomsDashboard.css";
 
 export default function InstructorClassroomsDashboard() {
@@ -10,6 +11,9 @@ export default function InstructorClassroomsDashboard() {
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,6 +97,12 @@ export default function InstructorClassroomsDashboard() {
     }
   };
 
+  const openFeedback = (student, quiz) => {
+    setSelectedStudent(student);
+    setSelectedQuiz(quiz);
+    setShowModal(true);
+  };
+
   if (loading) return <p>Loading classrooms...</p>;
 
   return (
@@ -124,17 +134,13 @@ export default function InstructorClassroomsDashboard() {
                     autoFocus
                   />
                   <div className="edit-buttons">
-                    <button
-                      onClick={() => updateClassroom(classroom.id, editingName)}
-                    >
+                    <button onClick={() => updateClassroom(classroom.id, editingName)}>
                       ✅ Done
                     </button>
-                    <button
-                      onClick={() => {
-                        setEditingId(null);
-                        setEditingName("");
-                      }}
-                    >
+                    <button onClick={() => {
+                      setEditingId(null);
+                      setEditingName("");
+                    }}>
                       ❌ Cancel
                     </button>
                   </div>
@@ -145,12 +151,10 @@ export default function InstructorClassroomsDashboard() {
                   <p><strong>{classroom.students?.length || 0}</strong> students enrolled</p>
 
                   <div className="classroom-buttons">
-                    <button
-                      onClick={() => {
-                        setEditingId(classroom.id);
-                        setEditingName(classroom.name);
-                      }}
-                    >
+                    <button onClick={() => {
+                      setEditingId(classroom.id);
+                      setEditingName(classroom.name);
+                    }}>
                       ✏️ Edit
                     </button>
                     <button onClick={() => navigate(`/classrooms/${classroom.id}/manage-students`)}>
@@ -161,11 +165,35 @@ export default function InstructorClassroomsDashboard() {
                     </button>
                     <button onClick={() => deleteClassroom(classroom.id)}>🗑️ Delete</button>
                   </div>
+
+                  {classroom.students?.length > 0 && (
+                    <div className="student-list-section">
+                      <h4>Your Students:</h4>
+                      <ul className="student-list">
+                        {classroom.students.map((student) => (
+                          <li key={student.id}>
+                            👩‍🎓 {student.username}
+                            <button onClick={() => openFeedback(student, { id: -1, title: "General" })}>
+                              💬 Give Feedback
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </>
               )}
             </div>
           ))}
         </div>
+      )}
+
+      {showModal && selectedStudent && selectedQuiz && (
+        <FeedbackModal
+          student={selectedStudent}
+          quiz={selectedQuiz}
+          onClose={() => setShowModal(false)}
+        />
       )}
     </div>
   );

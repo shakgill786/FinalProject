@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { getAllQuizzes, deleteQuizThunk } from "../../redux/quizzes";
-import GiveFeedbackForm from "../Quizzes/GiveFeedbackForm";
+import InstructorStudentList from "./InstructorStudentList";
 import "./InstructorDashboard.css";
 
 export default function InstructorDashboard() {
@@ -12,7 +12,6 @@ export default function InstructorDashboard() {
   const sessionUser = useSelector((st) => st.session.user);
   const quizzes = useSelector((st) => Object.values(st.quizzes));
   const [loading, setLoading] = useState(true);
-  const [showFeedbackForm, setShowFeedbackForm] = useState(null);
 
   useEffect(() => {
     if (!sessionUser) return;
@@ -27,6 +26,7 @@ export default function InstructorDashboard() {
   return (
     <div className="dashboard-container">
       <h1>Instructor Dashboard</h1>
+
       <div className="dashboard-buttons">
         <Link to="/create">
           <button className="create-quiz-button">➕ Create New Quiz</button>
@@ -62,24 +62,19 @@ export default function InstructorDashboard() {
                     }
                   }}
                   className="delete-quiz-button"
-                >🗑️ Delete</button>
-              </div>
-
-              <div className="feedback-form-toggle">
-                <button onClick={() =>
-                  setShowFeedbackForm((prev) => prev === q.id ? null : q.id)
-                }>
-                  {showFeedbackForm === q.id ? "❌ Hide Feedback" : "💬 Give Feedback"}
+                >
+                  🗑️ Delete
                 </button>
-
-                {showFeedbackForm === q.id && (
-                  <GiveFeedbackForm quizId={q.id} studentId={1} /> // ← Replace `1` with selected student ID logic
-                )}
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* 🧑‍🎓 STUDENT LIST + QUIZ HISTORY + FEEDBACK */}
+      <div className="student-feedback-section">
+        <InstructorStudentList />
+      </div>
     </div>
   );
 }
