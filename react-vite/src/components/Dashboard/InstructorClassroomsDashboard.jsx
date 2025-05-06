@@ -5,7 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { getCookie } from "../../utils/csrf";
-import { thunkLoadFeedback } from "../../redux/feedback";
+import {
+  thunkLoadFeedback,
+  thunkDeleteFeedback,
+  thunkUpdateFeedback,
+} from "../../redux/feedback";
 import FeedbackModal from "./FeedbackModal";
 import "./InstructorClassroomsDashboard.css";
 
@@ -18,8 +22,12 @@ export default function InstructorClassroomsDashboard() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [editingFeedbackId, setEditingFeedbackId] = useState(null);
+  const [editingFeedbackContent, setEditingFeedbackContent] = useState("");
+
   const dispatch = useDispatch();
   const feedback = useSelector((state) => state.feedback);
+  const user = useSelector((state) => state.session.user);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,11 +35,12 @@ export default function InstructorClassroomsDashboard() {
   }, []);
 
   const fetchClassrooms = async () => {
-    const res = await fetch("/api/classrooms/?include=quizzes", { credentials: "include" });
+    const res = await fetch("/api/classrooms/?include=quizzes", {
+      credentials: "include",
+    });
     if (res.ok) {
       const data = await res.json();
       setClassrooms(data);
-
       const allStudents = data.flatMap((cls) => cls.students || []);
       allStudents.forEach((s) => dispatch(thunkLoadFeedback(s.id)));
     }
@@ -106,6 +115,25 @@ export default function InstructorClassroomsDashboard() {
     }
   };
 
+  const handleDeleteFeedback = async (feedbackId) => {
+    const confirmed = window.confirm("Delete this feedback?");
+    if (!confirmed) return;
+    await dispatch(thunkDeleteFeedback(feedbackId));
+    toast.success("🗑️ Feedback deleted");
+  };
+
+  const handleUpdateFeedback = async (feedbackId) => {
+    if (!editingFeedbackContent.trim()) return;
+    const res = await dispatch(thunkUpdateFeedback(feedbackId, editingFeedbackContent));
+    if (!res.error) {
+      setEditingFeedbackId(null);
+      setEditingFeedbackContent("");
+      toast.success("✅ Feedback updated");
+    } else {
+      toast.error("❌ Failed to update feedback");
+    }
+  };
+
   if (loading) return <p>Loading classrooms...</p>;
 
   return (
@@ -173,10 +201,36 @@ export default function InstructorClassroomsDashboard() {
                           .map((f) => (
                             <div key={f.id} className="feedback-entry">
                               <strong>{f.quiz_title || "🗣️ General Feedback"}</strong>
-                              <p>{f.content}</p>
-                              <small>{f.created_at}</small>
+                              {editingFeedbackId === f.id ? (
+                                <>
+                                  <textarea
+                                    value={editingFeedbackContent}
+                                    onChange={(e) => setEditingFeedbackContent(e.target.value)}
+                                    rows={3}
+                                  />
+                                  <button onClick={() => handleUpdateFeedback(f.id)}>💾 Save</button>
+                                  <button onClick={() => {
+                                    setEditingFeedbackId(null);
+                                    setEditingFeedbackContent("");
+                                  }}>❌ Cancel</button>
+                                </>
+                              ) : (
+                                <>
+                                  <p>{f.content}</p>
+                                  <small>{new Date(f.created_at).toLocaleString()}</small>
+                                  {user?.role === "instructor" && (
+                                    <div className="feedback-buttons">
+                                      <button onClick={() => {
+                                        setEditingFeedbackId(f.id);
+                                        setEditingFeedbackContent(f.content);
+                                      }}>✏️ Edit</button>
+                                      <button onClick={() => handleDeleteFeedback(f.id)}>🗑️ Delete</button>
+                                    </div>
+                                  )}
+                                </>
+                              )}
                             </div>
-                        ))}
+                          ))}
                       </div>
                     ))}
                   </div>
@@ -189,17 +243,17 @@ export default function InstructorClassroomsDashboard() {
 
       {showFeedbackModal && selectedStudent && selectedClassroom && (
         <FeedbackModal
-        student={selectedStudent}
-        classroom={{
-          id: selectedClassroom.id,
-          quizzes: selectedClassroom.quizzes || []
-        }}
-        onClose={() => {
-          setShowFeedbackModal(false);
-          setSelectedStudent(null);
-          setSelectedClassroom(null);
-        }}
-      />
+          student={selectedStudent}
+          classroom={{
+            id: selectedClassroom.id,
+            quizzes: selectedClassroom.quizzes || [],
+          }}
+          onClose={() => {
+            setShowFeedbackModal(false);
+            setSelectedStudent(null);
+            setSelectedClassroom(null);
+          }}
+        />
       )}
     </div>
   );

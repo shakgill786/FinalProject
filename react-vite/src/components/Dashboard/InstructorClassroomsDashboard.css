@@ -89,3 +89,14 @@
   border: 1px solid #ddd;
   border-radius: 6px;
 }
+.feedback-entry-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.feedback-entry-buttons button {
+  padding: 2px 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
