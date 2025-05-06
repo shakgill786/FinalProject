@@ -127,3 +127,11 @@
   background-color: #4caf50;
   transition: width 0.5s;
 }
+
+.general-feedback {
+  margin: 2rem 0;
+  padding: 1rem;
+  background-color: #f6f6ff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}

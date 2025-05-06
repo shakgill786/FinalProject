@@ -8,8 +8,9 @@ export default function FeedbackSection({ studentId, quizId }) {
   const sessionUser = useSelector((state) => state.session.user);
 
   const feedback = useSelector((state) =>
-    Object.values(state.feedback).filter(
-      (fb) => fb.student_id === studentId && fb.quiz_id === quizId
+    Object.values(state.feedback).filter((fb) =>
+      fb.student_id === studentId &&
+      ((quizId === null && fb.quiz_id === null) || fb.quiz_id === quizId)
     )
   );
 

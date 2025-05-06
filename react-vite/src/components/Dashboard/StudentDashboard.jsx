@@ -16,13 +16,16 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/quizzes/history", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        setHistory(data);
-        setLoading(false);
+    const loadData = async () => {
+      const res = await fetch("/api/quizzes/history", { credentials: "include" });
+      const data = await res.json();
+      setHistory(data);
+      setLoading(false);
+      if (sessionUser?.id) {
         dispatch(thunkLoadFeedback(sessionUser.id));
-      });
+      }
+    };
+    loadData();
   }, [refreshKey]);
 
   const refreshHistory = () => setRefreshKey((prev) => prev + 1);
@@ -48,6 +51,11 @@ export default function StudentDashboard() {
       <button className="leaderboard-btn" onClick={() => navigate("/leaderboard")}>
         🧠 View Leaderboard
       </button>
+
+      <section className="general-feedback">
+        <h2>🗣️ General Feedback</h2>
+        <FeedbackSection studentId={sessionUser.id} quizId={null} />
+      </section>
 
       {loading ? (
         <p>Loading your quiz history...</p>
@@ -80,7 +88,7 @@ export default function StudentDashboard() {
 
                       {sessionUser.role === "instructor" && (
                         <GiveFeedbackForm
-                          studentId={quiz.student_id || sessionUser.id}
+                          studentId={sessionUser.id}
                           quizId={quiz.id}
                           onSuccess={refreshHistory}
                         />
