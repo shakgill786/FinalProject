@@ -61,10 +61,8 @@
     background: #ddd;
   }
   
-  /* InstructorDashboard.css */
-
 .edit-quiz-button {
-  background-color: #ffc107;       /* a nice yellow */
+  background-color: #ffc107;       
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -75,4 +73,19 @@
 
 .edit-quiz-button:hover {
   background-color: #e0a800;
+}
+
+.student-feedback-card {
+  background: #f7f7f7;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.feedback-entry {
+  margin-top: 8px;
+  background: white;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
 }

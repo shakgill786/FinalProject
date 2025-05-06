@@ -4,4 +4,5 @@ export function getCookie(name) {
     const [k, v] = cookie.split("=");
     if (k === name) return decodeURIComponent(v);
   }
+  return null;
 }

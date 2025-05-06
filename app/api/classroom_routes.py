@@ -2,8 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 from flask_login import current_user, login_required
-from app.models import db, Classroom, User
-from app.models.classroom_quiz import ClassroomQuiz
+from app.models import db, Classroom, User, ClassroomQuiz, Quiz
 from app.models.quiz_attempt import QuizAttempt
 
 classroom_routes = Blueprint("classrooms", __name__)
@@ -30,8 +29,33 @@ def create_classroom():
 def get_classrooms():
     if current_user.role != "instructor":
         return {"error": "Unauthorized"}, 403
+
     classes = Classroom.query.filter_by(instructor_id=current_user.id).all()
-    return jsonify([c.to_dict() for c in classes])
+    classrooms_with_quizzes = []
+
+    for c in classes:
+        class_dict = c.to_dict()
+        quiz_ids = [cq.quiz_id for cq in ClassroomQuiz.query.filter_by(classroom_id=c.id)]
+        quizzes = Quiz.query.filter(Quiz.id.in_(quiz_ids)).all()
+        class_dict["quizzes"] = [q.to_dict() for q in quizzes]
+        classrooms_with_quizzes.append(class_dict)
+
+    return jsonify(classrooms_with_quizzes)
+
+
+@classroom_routes.route("/<int:classroom_id>", methods=["GET"])
+@login_required
+def get_single_classroom(classroom_id):
+    cls = Classroom.query.get_or_404(classroom_id)
+    if cls.instructor_id != current_user.id:
+        return {"error": "Unauthorized"}, 403
+
+    class_dict = cls.to_dict()
+    quiz_ids = [cq.quiz_id for cq in ClassroomQuiz.query.filter_by(classroom_id=classroom_id)]
+    quizzes = Quiz.query.filter(Quiz.id.in_(quiz_ids)).all()
+    class_dict["quizzes"] = [q.to_dict() for q in quizzes]
+
+    return jsonify(class_dict)
 
 
 @classroom_routes.route("/<int:classroom_id>", methods=["PUT"])
@@ -56,15 +80,6 @@ def delete_classroom(classroom_id):
     db.session.delete(cls)
     db.session.commit()
     return {"message": "Classroom deleted"}
-
-
-@classroom_routes.route("/<int:classroom_id>", methods=["GET"])
-@login_required
-def get_single_classroom(classroom_id):
-    cls = Classroom.query.get_or_404(classroom_id)
-    if cls.instructor_id != current_user.id:
-        return {"error": "Unauthorized"}, 403
-    return jsonify(cls.to_dict())
 
 
 # ── STUDENT MANAGEMENT ─────────────────────────────────────

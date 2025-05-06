@@ -1,3 +1,5 @@
+// react-vite/src/components/Dashboard/FeedbackModal.jsx
+
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -6,22 +8,20 @@ import {
 } from "../../redux/feedback";
 import "./FeedbackModal.css";
 
-export default function FeedbackModal({ quiz, student, onClose }) {
+export default function FeedbackModal({ student, classroom, onClose }) {
   const dispatch = useDispatch();
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [selectedQuizId, setSelectedQuizId] = useState(quiz?.id || "general");
+  const [selectedQuizId, setSelectedQuizId] = useState("general");
 
   const feedback = useSelector((state) =>
     Object.values(state.feedback).find(
       (f) => f.student_id === student.id &&
         (selectedQuizId === "general"
           ? f.quiz_id === null
-          : f.quiz_id === selectedQuizId)
+          : f.quiz_id === Number(selectedQuizId))
     )
   );
-
-  const allQuizzes = useSelector((state) => Object.values(state.quizzes));
 
   useEffect(() => {
     dispatch(thunkLoadFeedback(student.id));
@@ -34,7 +34,7 @@ export default function FeedbackModal({ quiz, student, onClose }) {
     const res = await dispatch(
       thunkCreateFeedback({
         student_id: student.id,
-        quiz_id: selectedQuizId === "general" ? null : selectedQuizId,
+        quiz_id: selectedQuizId === "general" ? null : Number(selectedQuizId),
         content: content.trim(),
       })
     );
@@ -61,7 +61,7 @@ export default function FeedbackModal({ quiz, student, onClose }) {
             onChange={(e) => setSelectedQuizId(e.target.value)}
           >
             <option value="general">🗣️ General Feedback</option>
-            {allQuizzes.map((q) => (
+            {classroom?.quizzes?.map((q) => (
               <option key={q.id} value={q.id}>
                 📘 {q.title}
               </option>

@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy.sql import func
 from app.models.db import db, environment, SCHEMA
+import pytz
 
 class Feedback(db.Model):
     __tablename__ = "feedback"
@@ -21,14 +22,16 @@ class Feedback(db.Model):
     quiz = db.relationship("Quiz", back_populates="feedbacks")
 
     def to_dict(self):
+        eastern = pytz.timezone("US/Eastern")
+        local_time = self.created_at.astimezone(eastern)
         return {
             "id": self.id,
             "teacher_id": self.teacher_id,
             "student_id": self.student_id,
             "quiz_id": self.quiz_id,
             "content": self.content,
-            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M"),
+            "created_at": local_time.strftime("%Y-%m-%d %I:%M %p"),
             "teacher_name": self.teacher.username if self.teacher else None,
             "student_name": self.student.username if self.student else None,
-            "quiz_title": self.quiz.title if self.quiz else "General" if self.quiz_id is None else None,
-        }
+            "quiz_title": self.quiz.title if self.quiz else "General Feedback",
+    }
