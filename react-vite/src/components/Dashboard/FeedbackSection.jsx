@@ -5,6 +5,8 @@ import "./FeedbackSection.css";
 
 export default function FeedbackSection({ studentId, quizId }) {
   const dispatch = useDispatch();
+  const sessionUser = useSelector((state) => state.session.user);
+
   const feedback = useSelector((state) =>
     Object.values(state.feedback).filter(
       (fb) => fb.student_id === studentId && fb.quiz_id === quizId
@@ -12,9 +14,7 @@ export default function FeedbackSection({ studentId, quizId }) {
   );
 
   useEffect(() => {
-    if (studentId) {
-      dispatch(thunkLoadFeedback(studentId));
-    }
+    if (studentId) dispatch(thunkLoadFeedback(studentId));
   }, [dispatch, studentId]);
 
   const handleDelete = async (feedbackId) => {
@@ -30,7 +30,9 @@ export default function FeedbackSection({ studentId, quizId }) {
         {feedback.map((fb) => (
           <li key={fb.id} className="feedback-entry">
             <p>{fb.content}</p>
-            <button onClick={() => handleDelete(fb.id)}>🗑️ Delete</button>
+            {sessionUser?.role === "instructor" && (
+              <button onClick={() => handleDelete(fb.id)}>🗑️ Delete</button>
+            )}
           </li>
         ))}
       </ul>

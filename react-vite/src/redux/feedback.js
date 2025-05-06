@@ -112,7 +112,7 @@ const initialState = {};
 export default function feedbackReducer(state = initialState, action) {
   switch (action.type) {
     case LOAD_FEEDBACK: {
-      const newState = {};
+      const newState = { ...state };
       action.feedbackList.forEach((fb) => {
         newState[fb.id] = fb;
       });

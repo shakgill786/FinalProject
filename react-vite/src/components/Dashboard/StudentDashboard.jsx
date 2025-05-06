@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { thunkLoadFeedback } from "../../redux/feedback";
 import "./StudentDashboard.css";
-import FeedbackSection from "../Dashboard/FeedbackSection";
+import FeedbackSection from "./FeedbackSection";
 import GiveFeedbackForm from "../Quizzes/GiveFeedbackForm";
 
 export default function StudentDashboard() {
   const sessionUser = useSelector((state) => state.session.user);
+  const dispatch = useDispatch();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -19,6 +21,7 @@ export default function StudentDashboard() {
       .then((data) => {
         setHistory(data);
         setLoading(false);
+        dispatch(thunkLoadFeedback(sessionUser.id));
       });
   }, [refreshKey]);
 
@@ -73,7 +76,7 @@ export default function StudentDashboard() {
                         🔁 Retake
                       </button>
 
-                      <FeedbackSection studentId={quiz.student_id || sessionUser.id} quizId={quiz.id} />
+                      <FeedbackSection studentId={sessionUser.id} quizId={quiz.id} />
 
                       {sessionUser.role === "instructor" && (
                         <GiveFeedbackForm
