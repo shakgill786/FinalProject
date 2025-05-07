@@ -24,11 +24,6 @@ export default function QuizList() {
 
   return (
     <div className="quiz-list-hero">
-      <img
-        src="/KnowBie.png"
-        alt="KnowBie Logo"
-        className="quiz-list-logo"
-      />
       <h1 className="hero-title">Welcome to KnowBie</h1>
       <p className="hero-subtitle">Learn. Play. Conquer. 🧠</p>
 
@@ -41,7 +36,7 @@ export default function QuizList() {
           {quizzes.map((quiz) => (
             <div className="quiz-card" key={quiz.id}>
               <h3>{quiz.title}</h3>
-              <p>{quiz.grade_level}</p>
+              <p className="quiz-meta">{quiz.grade_level}</p>
               <p>{quiz.description}</p>
               <button
                 className="view-btn"
