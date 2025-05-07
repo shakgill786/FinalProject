@@ -4,6 +4,7 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { thunkLogout } from "../../redux/session";
 import { toast } from "react-toastify";
+import logo from "../../../public/KnowBie.png"; // adjust path if needed
 import "./NavBar.css";
 
 export default function NavBar() {
@@ -12,9 +13,7 @@ export default function NavBar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const confirmLogout = window.confirm("Are you sure you want to log out?");
-    if (!confirmLogout) return;
-
+    if (!window.confirm("Are you sure you want to log out?")) return;
     await dispatch(thunkLogout());
     toast.info("You’ve been logged out.");
     navigate("/login");
@@ -23,29 +22,33 @@ export default function NavBar() {
   return (
     <nav className="navbar">
       <h1 className="logo">
-        <Link to="/">KnowBie</Link>
+        <Link to="/">
+          <img src={logo} alt="Knowbie Logo" className="navbar-logo" />
+        </Link>
       </h1>
 
       <div className="nav-links">
         <NavLink to="/" className="nav-item">🧠 Quizzes</NavLink>
 
         {sessionUser?.role === "instructor" && (
-          <NavLink to="/create" className="nav-item">➕ Create Quiz</NavLink>
+          <>
+            <NavLink to="/create" className="nav-item">➕ Create Quiz</NavLink>
+            <NavLink to="/dashboard/instructor" className="nav-item">📊 Dashboard</NavLink>
+          </>
         )}
 
-        {sessionUser?.role === "instructor" && (
-          <NavLink to="/dashboard/instructor" className="nav-item">📊 Dashboard</NavLink>
-        )}
-        
         {sessionUser?.role === "student" && (
           <NavLink to="/dashboard/student" className="nav-item">🎓 My Dashboard</NavLink>
         )}
 
         {!sessionUser ? (
-          <NavLink to="/login" className="nav-item login-btn">🔐 Log In</NavLink>
+          <>
+            <NavLink to="/login" className="nav-item login-btn">🔐 Log In</NavLink>
+            <NavLink to="/signup" className="nav-item">📝 Sign Up</NavLink>
+          </>
         ) : (
           <>
-            <span className="nav-item welcome-text">👋 Welcome, {sessionUser.username}!</span>
+            <span className="nav-item welcome-text">👋 {sessionUser.username}</span>
             <button
               onClick={handleLogout}
               className="nav-item logout-btn"

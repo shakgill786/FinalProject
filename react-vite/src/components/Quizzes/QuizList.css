@@ -62,3 +62,49 @@
 .view-btn:hover {
   background-color: #45a049;
 }
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: linear-gradient(to bottom, #011c28, #04314a);
+  min-height: 100vh;
+  color: #00e5ff;
+  text-align: center;
+}
+
+.hero-logo {
+  width: 120px;
+  margin-bottom: 30px;
+}
+
+.hero-title {
+  font-size: 3rem;
+  letter-spacing: 3px;
+  font-weight: bold;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 40px;
+}
+
+.hero-buttons button {
+  background: #00e5ff;
+  color: #011c28;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero-buttons button:hover {
+  background: #00b8d4;
+  transform: scale(1.05);
+}

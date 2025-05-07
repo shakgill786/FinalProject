@@ -10,7 +10,7 @@ export default function QuizList() {
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/quizzes/", {
-        credentials: "include",        // ← include the session cookie
+        credentials: "include",
       });
       if (res.ok) {
         const data = await res.json();
@@ -22,27 +22,37 @@ export default function QuizList() {
     })();
   }, []);
 
-  if (loading) return <p>Loading quizzes...</p>;
-
   return (
-    <div className="quiz-list-container">
-      <h2>🧠 Available Quizzes</h2>
-      {quizzes.length === 0 && <p>No quizzes yet!</p>}
-      <div className="quiz-card-grid">
-        {quizzes.map((quiz) => (
-          <div className="quiz-card" key={quiz.id}>
-            <h3>{quiz.title}</h3>
-            <p>{quiz.grade_level}</p>
-            <p>{quiz.description}</p>
-            <button
-              className="view-btn"
-              onClick={() => navigate(`/quizzes/${quiz.id}`)}
-            >
-              Start Quiz 🚀
-            </button>
-          </div>
-        ))}
-      </div>
+    <div className="quiz-list-hero">
+      <img
+        src="/KnowBie.png"
+        alt="KnowBie Logo"
+        className="quiz-list-logo"
+      />
+      <h1 className="hero-title">Welcome to KnowBie</h1>
+      <p className="hero-subtitle">Learn. Play. Conquer. 🧠</p>
+
+      {loading ? (
+        <p className="loading-text">Loading quizzes...</p>
+      ) : quizzes.length === 0 ? (
+        <p className="no-quizzes">No quizzes yet!</p>
+      ) : (
+        <div className="quiz-card-grid">
+          {quizzes.map((quiz) => (
+            <div className="quiz-card" key={quiz.id}>
+              <h3>{quiz.title}</h3>
+              <p>{quiz.grade_level}</p>
+              <p>{quiz.description}</p>
+              <button
+                className="view-btn"
+                onClick={() => navigate(`/quizzes/${quiz.id}`)}
+              >
+                Start Quiz 🚀
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

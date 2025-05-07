@@ -78,8 +78,9 @@ export default function App() {
           path="/dashboard/instructor"
           element={<InstructorDashboard />}
         />
-        <Route path="/create" element={<CreateQuizForm />} />
-
+        <Route path="/create" element={
+          sessionUser?.role === "instructor" ? <CreateQuizForm /> : <Navigate to="/" />} 
+        />
         {/* ─── Public / Student routes ─────────────────────── */}
         <Route path="/" element={<QuizList />} />
         <Route path="/login" element={<LoginForm />} />

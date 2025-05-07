@@ -50,3 +50,9 @@
 .welcome-text {
   font-weight: bold;
 }
+
+.navbar-logo {
+  height: 100px;
+  width: 150px;
+  vertical-align: middle;
+}

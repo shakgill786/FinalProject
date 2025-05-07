@@ -23,7 +23,6 @@ export default function InstructorStudentList() {
 
   return (
     <div className="instructor-student-list">
-      <h2>📋 Your Students</h2>
       <ul>
         {students.map((student) => (
           <li key={student.id} className="student-entry">
