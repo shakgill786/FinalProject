@@ -1,5 +1,3 @@
-// src/components/Dashboard/InstructorDashboard.jsx
-
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -14,18 +12,17 @@ export default function InstructorDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!sessionUser) return;
-    if (sessionUser.role === "instructor") {
+    if (sessionUser?.role === "instructor") {
       dispatch(getAllQuizzes()).finally(() => setLoading(false));
     }
   }, [dispatch, sessionUser]);
 
   if (!sessionUser) return null;
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p className="loading-text">Loading…</p>;
 
   return (
-    <div className="dashboard-container">
-      <h1>Instructor Dashboard</h1>
+    <div className="dashboard-container glass-panel">
+      <h1>📚 Instructor Dashboard</h1>
 
       <div className="dashboard-buttons">
         <Link to="/create">
@@ -37,7 +34,7 @@ export default function InstructorDashboard() {
       </div>
 
       {quizzes.length === 0 ? (
-        <p>No quizzes yet. Create one!</p>
+        <p className="no-quizzes-text">No quizzes yet. Create one!</p>
       ) : (
         <div className="quiz-list">
           {quizzes.map((q) => (
@@ -47,13 +44,13 @@ export default function InstructorDashboard() {
               <p><strong>Grade:</strong> {q.grade_level || "N/A"}</p>
               <div className="quiz-actions">
                 <Link to={`/quizzes/${q.id}`}>
-                  <button className="view-quiz-button">📋 View Quiz</button>
+                  <button className="view-quiz-button">📋 View</button>
                 </Link>
                 <Link to={`/dashboard/instructor/quizzes/${q.id}/manage-questions`}>
                   <button className="manage-quiz-button">🛠️ Manage</button>
                 </Link>
                 <Link to={`/dashboard/instructor/quizzes/${q.id}/edit`}>
-                  <button className="edit-quiz-button">✏️ Edit Quiz</button>
+                  <button className="edit-quiz-button">✏️ Edit</button>
                 </Link>
                 <button
                   onClick={() => {
@@ -71,7 +68,6 @@ export default function InstructorDashboard() {
         </div>
       )}
 
-      {/* 🧑‍🎓 STUDENT LIST + QUIZ HISTORY + FEEDBACK */}
       <div className="student-feedback-section">
         <InstructorStudentList />
       </div>

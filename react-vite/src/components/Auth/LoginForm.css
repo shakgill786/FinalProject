@@ -50,4 +50,43 @@
     border-radius: 6px;
     font-size: 0.9rem;
   }
-  
+  /* Add below your .login-card styles */
+
+.signup-prompt {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+  color: #231c89;
+}
+
+.signup-link {
+  color: #00f7ff;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.signup-link:hover {
+  color: #00c7cc;
+}
+.signup-button-container {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.signup-prompt {
+  margin-bottom: 0.5rem;
+  color: #1c2b69;
+}
+
+.glow-button.alt {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #1c2b69;
+  color: #1c2b69;
+  transition: all 0.3s ease-in-out;
+}
+
+.glow-button.alt:hover {
+  background: #00f7ff;
+  color: #000;
+  transform: scale(1.05);
+}
