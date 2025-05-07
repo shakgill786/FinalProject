@@ -1,6 +1,8 @@
+// src/components/Auth/LoginForm.jsx
+
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { thunkLogin } from "../../redux/session";
 
 export default function LoginForm() {
@@ -15,26 +17,20 @@ export default function LoginForm() {
     e.preventDefault();
     setErrors([]);
 
-    // ✅ Fetch fresh CSRF token before attempting login
     await fetch("/api/csrf/restore", { credentials: "include" });
-
     const res = await dispatch(thunkLogin({ email, password }));
 
     if (res?.errors || res?.email || res?.password) {
       const err = res.errors || Object.values(res).flat();
       setErrors(err);
     } else {
-      if (res?.role === "instructor") {
-        navigate("/dashboard/instructor");
-      } else {
-        navigate("/");
-      }
+      navigate(res?.role === "instructor" ? "/dashboard/instructor" : "/dashboard/student");
     }
   };
 
   return (
     <div className="login-form-wrapper">
-      <h2>Login</h2>
+      <h2>🔐 Log In</h2>
       <form onSubmit={handleSubmit}>
         {errors.map((err, i) => (
           <p key={i} className="error">{err}</p>
@@ -53,8 +49,9 @@ export default function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Log In</button>
+        <button type="submit">✅ Log In</button>
       </form>
+      <p>Don’t have an account? <Link to="/signup">Sign up here</Link> 💡</p>
     </div>
   );
 }

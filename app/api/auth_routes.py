@@ -45,16 +45,21 @@ def logout():
 @auth_routes.route('/signup', methods=['POST'])
 def sign_up():
     """
-    Creates a new user and logs them in.
+    Creates a new user with role and logs them in.
     """
     form = SignUpForm()
     form['csrf_token'].data = request.cookies['csrf_token']
-    
+
     if form.validate_on_submit():
+        role = request.json.get("role", "student").strip().lower()
+        if role not in ["student", "instructor"]:
+            role = "student"  # Fallback for safety
+
         user = User(
             username=form.data['username'],
             email=form.data['email'],
-            password=form.data['password']
+            password=form.data['password'],
+            role=role
         )
         db.session.add(user)
         db.session.commit()
@@ -70,6 +75,7 @@ def unauthorized():
     Returns unauthorized JSON when flask-login authentication fails.
     """
     return {'errors': {'message': 'Unauthorized'}}, 401
+
 
 @auth_routes.route("/debug", methods=["GET"])
 def debug():

@@ -1,10 +1,10 @@
 import { getCookie } from "../utils/csrf";
 
-// Action Types
+// ─── ACTION TYPES ───────────────────────────────
 const SET_USER = "session/setUser";
 const REMOVE_USER = "session/removeUser";
 
-// Action Creators
+// ─── ACTION CREATORS ────────────────────────────
 const setUser = (user) => ({
   type: SET_USER,
   payload: user,
@@ -14,9 +14,9 @@ const removeUser = () => ({
   type: REMOVE_USER,
 });
 
-// Thunks
+// ─── THUNKS ──────────────────────────────────────
 
-// ✅ Authenticate current user (used on app load)
+// ✅ Auth check on load
 export const thunkAuthenticate = () => async (dispatch) => {
   const response = await fetch("/api/auth/", {
     credentials: "include",
@@ -38,7 +38,7 @@ export const thunkLogin = (credentials) => async (dispatch) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": csrfToken, // ✅ Fixed
+      "X-CSRFToken": csrfToken,
     },
     credentials: "include",
     body: JSON.stringify(credentials),
@@ -64,7 +64,7 @@ export const thunkSignup = (userInfo) => async (dispatch) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": csrfToken, // ✅ Fixed
+      "X-CSRFToken": csrfToken,
     },
     credentials: "include",
     body: JSON.stringify(userInfo),
@@ -88,7 +88,7 @@ export const thunkLogout = () => async (dispatch) => {
   dispatch(removeUser());
 };
 
-// Reducer
+// ─── REDUCER ─────────────────────────────────────
 const initialState = { user: null };
 
 export default function sessionReducer(state = initialState, action) {

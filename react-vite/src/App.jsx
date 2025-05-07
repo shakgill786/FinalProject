@@ -21,13 +21,14 @@ import StudentManagementPage from "./components/Dashboard/StudentManagementPage"
 import StudentDashboard from "./components/Dashboard/StudentDashboard";
 import Leaderboard from "./components/Dashboard/Leaderboard";
 import LoginForm from "./components/Auth/LoginForm";
+import SignupForm from "./components/Auth/SignupForm";
 
 import { thunkAuthenticate } from "./redux/session";
 
 export default function App() {
   const dispatch = useDispatch();
   const sessionUser = useSelector((st) => st.session.user);
-  const location    = useLocation();
+  const location = useLocation();
 
   useEffect(() => {
     fetch("/api/csrf/restore", { credentials: "include" })
@@ -35,8 +36,8 @@ export default function App() {
       .catch(console.error);
   }, [dispatch]);
 
-  // if logged in and on /login, redirect home
-  if (sessionUser && location.pathname === "/login") {
+  // 🚀 Auto-redirect if logged in and on /login or /signup
+  if (sessionUser && ["/login", "/signup"].includes(location.pathname)) {
     const dest =
       sessionUser.role === "instructor"
         ? "/dashboard/instructor"
@@ -48,7 +49,7 @@ export default function App() {
     <>
       <NavBar />
       <Routes>
-        {/* ─── Instructor sub-routes first ──────────────────────── */}
+        {/* ─── Instructor routes ───────────────────────────── */}
         <Route
           path="/dashboard/instructor/quizzes/:quizId/edit"
           element={<EditQuizForm />}
@@ -79,13 +80,11 @@ export default function App() {
         />
         <Route path="/create" element={<CreateQuizForm />} />
 
-        {/* ─── Public / student-facing ─────────────────────────── */}
+        {/* ─── Public / Student routes ─────────────────────── */}
         <Route path="/" element={<QuizList />} />
         <Route path="/login" element={<LoginForm />} />
-        {/* THIS must come *after* any child “/quizzes/:quizId/…” routes */}
+        <Route path="/signup" element={<SignupForm />} />
         <Route path="/quizzes/:quizId" element={<TakeQuiz />} />
-
-        {/* ─── Student dashboard + leaderboard ─────────────────── */}
         <Route path="/dashboard/student" element={<StudentDashboard />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
