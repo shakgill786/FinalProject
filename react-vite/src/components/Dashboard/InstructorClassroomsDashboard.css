@@ -1,102 +1,213 @@
-/* src/components/Dashboard/InstructorClassroomsDashboard.css */
 .classrooms-dashboard {
-    padding: 20px;
-    max-width: 900px;
-    margin: auto;
-  }
-  
-  .create-classroom {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-  }
-  
-  .create-classroom input {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-  }
-  
-  .create-classroom button {
-    padding: 10px 15px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .create-classroom button:hover {
-    background-color: #45a049;
-  }
-  
-  .classroom-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .classroom-card {
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    flex: 1 1 300px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .classroom-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .classroom-buttons button {
-    padding: 8px 12px;
-    font-size: 14px;
-    background: #eee;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .classroom-buttons button:hover {
-    background: #ddd;
-  }
-  
-.edit-quiz-button {
-  background-color: #ffc107;       
-  color: #fff;
+  padding: 40px;
+  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+}
+
+.classrooms-dashboard h1 {
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  font-weight: 700;
+  color: #1e2a38;
+}
+
+.create-classroom {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.create-classroom input {
+  flex: 1;
+  max-width: 300px;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.create-classroom button {
+  padding: 10px 15px;
+  background-color: #7c3aed;
+  color: white;
   border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.2s;
 }
 
-.edit-quiz-button:hover {
-  background-color: #e0a800;
+.create-classroom button:hover {
+  background-color: #6d28d9;
+}
+
+.classroom-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.classroom-card {
+  background: #ffffff;
+  border: 2px solid #dbeafe;
+  border-radius: 10px;
+  padding: 20px;
+  width: 320px;
+  text-align: left;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+.classroom-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.classroom-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.classroom-buttons button {
+  flex: 1 1 45%;
+  padding: 8px 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.classroom-buttons button:nth-child(1) {
+  background-color: #eab308;
+  color: white;
+}
+
+.classroom-buttons button:nth-child(2) {
+  background-color: #0ea5e9;
+  color: white;
+}
+
+.classroom-buttons button:nth-child(3) {
+  background-color: #10b981;
+  color: white;
+}
+
+.classroom-buttons button:nth-child(4) {
+  background-color: #ef4444;
+  color: white;
+}
+
+.classroom-buttons button:hover {
+  filter: brightness(0.9);
 }
 
 .student-feedback-card {
-  background: #f7f7f7;
+  background: #f9fafb;
   border-radius: 8px;
   padding: 12px;
-  margin-top: 10px;
+  margin-top: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.student-feedback-card h4 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.student-feedback-card button {
+  background-color: #7c3aed;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .feedback-entry {
-  margin-top: 8px;
   background: white;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 6px;
-}
-.feedback-entry-buttons {
-  display: flex;
-  gap: 8px;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
-.feedback-entry-buttons button {
-  padding: 2px 6px;
-  font-size: 0.9rem;
+.feedback-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.feedback-buttons button {
+  padding: 5px 10px;
+  font-size: 0.85rem;
   cursor: pointer;
+  border-radius: 6px;
+  border: none;
+}
+
+.feedback-buttons button:first-child {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.feedback-buttons button:last-child {
+  background-color: #dc2626;
+  color: white;
+}
+
+.feedback-buttons button:hover {
+  filter: brightness(0.95);
+}
+
+/* Edit Drawer Modal */
+.edit-drawer {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 320px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: right 0.3s ease-in-out;
+  z-index: 999;
+}
+
+.edit-drawer.open {
+  right: 0;
+}
+
+.drawer-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.drawer-buttons button {
+  flex: 1;
+  padding: 10px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.drawer-buttons button:first-child {
+  background-color: #3b82f6;
+}
+
+.drawer-buttons button:last-child {
+  background-color: #ef4444;
 }

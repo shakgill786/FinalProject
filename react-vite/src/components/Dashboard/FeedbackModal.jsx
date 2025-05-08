@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   thunkCreateFeedback,
@@ -14,6 +14,8 @@ export default function FeedbackModal({ student, classroom, onClose }) {
   const [submitting, setSubmitting] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState("general");
   const [editMode, setEditMode] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const modalRef = useRef();
 
   const feedback = useSelector((state) =>
     Object.values(state.feedback).find(
@@ -28,8 +30,21 @@ export default function FeedbackModal({ student, classroom, onClose }) {
   useEffect(() => {
     dispatch(thunkLoadFeedback(student.id));
     setEditMode(false);
-    setContent(""); // reset when switching quizzes
+    setContent("");
+
+    const handleEsc = (e) => {
+      if (e.key === "Escape") triggerClose();
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [dispatch, student.id, selectedQuizId]);
+
+  const triggerClose = () => {
+    setClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 200); // match with animation duration
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +58,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     );
     if (!res.error) {
       setContent("");
-      onClose();
+      triggerClose();
     } else {
       alert("Error submitting feedback.");
     }
@@ -59,7 +74,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     if (!res.error) {
       setEditMode(false);
       setContent("");
-      onClose();
+      triggerClose();
     } else {
       alert("Failed to update feedback.");
     }
@@ -72,15 +87,15 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     if (!confirmed) return;
     await dispatch(thunkDeleteFeedback(feedback.id));
     setContent("");
-    onClose();
+    triggerClose();
   };
 
   return (
-    <div className="feedback-modal-overlay">
-      <div className="feedback-modal">
+    <div className={`feedback-modal-overlay ${closing ? "fade-out" : ""}`}>
+      <div className={`feedback-modal ${closing ? "closing" : ""}`} ref={modalRef}>
         <h3>📝 Feedback for {student.username}</h3>
 
-        <label>
+        <label className="quiz-selector">
           Select quiz:
           <select
             value={selectedQuizId}
@@ -100,11 +115,11 @@ export default function FeedbackModal({ student, classroom, onClose }) {
             <strong>Previous Feedback:</strong>
             <p>{feedback.content}</p>
             <div className="modal-buttons">
-              <button onClick={() => {
+              <button className="edit-btn" onClick={() => {
                 setEditMode(true);
                 setContent(feedback.content);
               }}>✏️ Edit</button>
-              <button onClick={handleDelete}>🗑️ Delete</button>
+              <button className="delete-btn" onClick={handleDelete}>🗑️ Delete</button>
             </div>
           </div>
         ) : (
@@ -117,8 +132,8 @@ export default function FeedbackModal({ student, classroom, onClose }) {
               required
             />
             <div className="modal-buttons">
-              <button type="button" onClick={onClose}>❌ Cancel</button>
-              <button type="submit" disabled={submitting}>
+              <button type="button" className="cancel-btn" onClick={triggerClose}>❌ Cancel</button>
+              <button type="submit" className="submit-btn" disabled={submitting}>
                 {editMode ? "💾 Save" : "✅ Submit"}
               </button>
             </div>

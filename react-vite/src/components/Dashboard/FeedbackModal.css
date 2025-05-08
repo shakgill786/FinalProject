@@ -1,81 +1,141 @@
-/* FeedbackModal.css */
 .feedback-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.feedback-modal-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.feedback-modal {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 30px;
+  width: 480px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: fadeInScale 0.3s ease-in-out;
+}
+
+.feedback-modal.closing {
+  animation: fadeOutScale 0.2s ease-in-out forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  
-  .feedback-modal {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
-    position: relative;
-    animation: slideIn 0.3s ease-out;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .feedback-modal h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    text-align: center;
+}
+
+@keyframes fadeOutScale {
+  from {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .feedback-modal textarea {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    resize: vertical;
-    margin-bottom: 1rem;
+  to {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  
-  .modal-buttons {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .modal-buttons button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .modal-buttons button[type="submit"] {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .modal-buttons button[type="button"] {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .modal-buttons button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-  }
-  
-  @keyframes slideIn {
-    from {
-      transform: translateY(-30px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0px);
-      opacity: 1;
-    }
-  }
-  
+}
+
+
+.feedback-modal h3 {
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #1e3c72;
+}
+
+.quiz-selector {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background-color: #6c63ff;
+  color: white;
+}
+.submit-btn:hover {
+  background-color: #564ee0;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+  color: black;
+}
+.cancel-btn:hover {
+  background-color: #aaa;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: black;
+}
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.existing-feedback {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
