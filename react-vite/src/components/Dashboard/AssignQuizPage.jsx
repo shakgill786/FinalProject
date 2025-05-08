@@ -1,4 +1,4 @@
-// src/components/Dashboard/AssignQuizPage.jsx
+// react-vite/src/components/Dashboard/AssignQuizPage.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -8,7 +8,6 @@ import "./AssignQuizPage.css";
 export default function AssignQuizPage() {
   const { classroomId } = useParams();
   const navigate = useNavigate();
-
   const [allQuizzes, setAllQuizzes] = useState([]);
   const [students, setStudents] = useState([]);
   const [classAssignedQuizIds, setClassAssignedQuizIds] = useState(new Set());
@@ -23,11 +22,7 @@ export default function AssignQuizPage() {
   }, []);
 
   const fetchAllData = async () => {
-    await Promise.all([
-      fetchQuizzes(),
-      fetchStudents(),
-      fetchAssignments(),
-    ]);
+    await Promise.all([fetchQuizzes(), fetchStudents(), fetchAssignments()]);
     setLoading(false);
   };
 
@@ -38,10 +33,7 @@ export default function AssignQuizPage() {
 
   const fetchStudents = async () => {
     const res = await fetch("/api/users/all-students", { credentials: "include" });
-    if (res.ok) {
-      const data = await res.json();
-      setStudents(data.students);
-    }
+    if (res.ok) setStudents((await res.json()).students);
   };
 
   const fetchAssignments = async () => {
@@ -58,7 +50,6 @@ export default function AssignQuizPage() {
 
   const handleToggleClassAssignment = async (quizId) => {
     await fetch("/api/csrf/restore", { credentials: "include" });
-
     const res = await fetch(`/api/classrooms/${classroomId}/assign-quiz`, {
       method: "POST",
       headers: {
@@ -68,20 +59,14 @@ export default function AssignQuizPage() {
       credentials: "include",
       body: JSON.stringify({ quiz_id: quizId }),
     });
-
     if (res.ok) {
-      const { message } = await res.json();
-      toast.success(`✅ ${message}`);
+      toast.success((await res.json()).message);
       await fetchAssignments();
-    } else {
-      const err = await res.json();
-      toast.error(err.error || "❌ Failed to toggle assignment");
-    }
+    } else toast.error("❌ Failed to toggle assignment");
   };
 
   const handleToggleStudentAssignment = async (studentId) => {
     await fetch("/api/csrf/restore", { credentials: "include" });
-
     const res = await fetch(`/api/classrooms/${classroomId}/assign-quiz-to-student`, {
       method: "POST",
       headers: {
@@ -89,55 +74,43 @@ export default function AssignQuizPage() {
         "X-CSRFToken": getCookie("csrf_token"),
       },
       credentials: "include",
-      body: JSON.stringify({
-        quiz_id: selectedQuizId,
-        student_id: studentId,
-      }),
+      body: JSON.stringify({ quiz_id: selectedQuizId, student_id: studentId }),
     });
-
     if (res.ok) {
-      const msg = await res.json();
-      toast.success(`🎯 ${msg.message}`);
+      toast.success((await res.json()).message);
       await fetchAssignments();
-    } else {
-      const err = await res.json();
-      toast.error(err.error || "❌ Failed to assign/unassign");
-    }
+    } else toast.error("❌ Failed to assign/unassign");
   };
 
   if (loading) return <p>Loading quizzes...</p>;
 
   return (
     <div className="assign-quiz-page">
-      <h1>📝 Assign Quizzes</h1>
+      <div className="assign-header">
+        <h1>📝 Assign Quizzes</h1>
+        <button className="back-btn" onClick={() => navigate("/dashboard/instructor/classrooms")}>
+          🔙 Back to Classrooms
+        </button>
+      </div>
 
-      <button
-        className="back-button"
-        onClick={() => navigate("/dashboard/instructor/classrooms")}
-      >
-        🔙 Back to Classrooms
-      </button>
-
-      <div className="quiz-list">
+      <div className="assign-quiz-grid">
         {allQuizzes.map((quiz) => {
           const assignedToClass = classAssignedQuizIds.has(quiz.id);
           const assignedStudents = studentNamesByQuiz[quiz.id] || [];
 
           return (
-            <div key={quiz.id} className="quiz-card">
+            <div key={quiz.id} className="assign-quiz-card">
               <h3>{quiz.title}</h3>
               <p>{quiz.description}</p>
-
-              <div className="quiz-buttons">
+              <div className="assign-buttons">
                 <button
-                  onClick={() => handleToggleClassAssignment(quiz.id)}
                   className={`assign-btn ${assignedToClass ? "assigned" : ""}`}
+                  onClick={() => handleToggleClassAssignment(quiz.id)}
                 >
                   {assignedToClass ? "✅ Unassign from Class" : "🏫 Assign to Class"}
                 </button>
-
                 <button
-                  className="assign-student-btn"
+                  className="student-modal-btn"
                   onClick={() => {
                     setSelectedQuizId(quiz.id);
                     setShowStudentModal(true);
@@ -146,11 +119,8 @@ export default function AssignQuizPage() {
                   🎯 Assign to Student
                 </button>
               </div>
-
               {assignedStudents.length > 0 && (
-                <p className="assigned-to">
-                  Assigned to: {assignedStudents.join(", ")}
-                </p>
+                <p className="assigned-list">Assigned to: {assignedStudents.join(", ")}</p>
               )}
             </div>
           );
@@ -159,24 +129,18 @@ export default function AssignQuizPage() {
 
       {showStudentModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Select a Student</h2>
-            <button
-              className="close-modal"
-              onClick={() => setShowStudentModal(false)}
-            >
-              ❌ Close
+          <div className="modal-drawer">
+            <h2>🎯 Assign Students</h2>
+            <button onClick={() => setShowStudentModal(false)} className="close-drawer">
+              ❌
             </button>
             <ul className="student-list">
               {students.map((student) => {
                 const assigned = studentAssignments[student.id]?.includes(selectedQuizId);
                 return (
-                  <li key={student.id}>
+                  <li key={student.id} className="student-entry">
                     {student.username}
-                    <button
-                      onClick={() => handleToggleStudentAssignment(student.id)}
-                      className="assign-btn-small"
-                    >
+                    <button onClick={() => handleToggleStudentAssignment(student.id)}>
                       {assigned ? "❌ Unassign" : "➕ Assign"}
                     </button>
                   </li>
