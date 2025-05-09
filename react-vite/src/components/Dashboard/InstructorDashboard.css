@@ -94,35 +94,35 @@
 }
 
 .view-quiz-button {
-  background-color: #3498db;
+  background-color: #10b981 !important;
   color: white;
 }
 .view-quiz-button:hover {
-  background-color: #2980b9;
+  filter: brightness(0.9) !important;
 }
 
 .manage-quiz-button {
-  background-color: #17a2b8;
+  background-color: #0ea5e9 !important;
   color: white;
 }
 .manage-quiz-button:hover {
-  background-color: #138496;
+  filter: brightness(0.9) !important;
 }
 
 .edit-quiz-button {
-  background-color: #f39c12;
+  background-color: #eab308 !important;
   color: white;
 }
 .edit-quiz-button:hover {
-  background-color: #e67e22;
+  filter: brightness(0.9) !important;
 }
 
 .delete-quiz-button {
-  background-color: #e74c3c;
+  background-color: #ef4444 !important;
   color: white;
 }
 .delete-quiz-button:hover {
-  background-color: #c0392b;
+  filter: brightness(0.9) !important;
 }
 
 .student-feedback-section {

@@ -185,12 +185,6 @@ export default function StudentDashboard() {
           <p>Average Score: {average}%</p>
           <p>Best Quiz: “{best.title}”</p>
           <p>Total Points: {totalPoints}</p>
-          <div className="progress-bar">
-            <div
-              className="fill"
-              style={{ width: `${Math.min(totalPoints, 100)}%` }}
-            />
-          </div>
         </section>
       )}
     </div>
