@@ -22,6 +22,7 @@ import StudentDashboard from "./components/Dashboard/StudentDashboard";
 import Leaderboard from "./components/Dashboard/Leaderboard";
 import LoginForm from "./components/Auth/LoginForm";
 import SignupForm from "./components/Auth/SignupForm";
+import UserProfile from "./components/Dashboard/UserProfile";
 
 import { thunkAuthenticate } from "./redux/session";
 
@@ -36,7 +37,7 @@ export default function App() {
       .catch(console.error);
   }, [dispatch]);
 
-  // 🚀 Auto-redirect if logged in and on /login or /signup
+  // Auto-redirect logged-in users off login/signup
   if (sessionUser && ["/login", "/signup"].includes(location.pathname)) {
     const dest =
       sessionUser.role === "instructor"
@@ -50,37 +51,22 @@ export default function App() {
       <NavBar />
       <Routes>
         {/* ─── Instructor routes ───────────────────────────── */}
+        <Route path="/dashboard/instructor/quizzes/:quizId/edit" element={<EditQuizForm />} />
+        <Route path="/dashboard/instructor/quizzes/:quizId/manage-questions" element={<ManageQuestions />} />
+        <Route path="/quizzes/:quizId/add-question" element={<CreateQuestionForm />} />
+        <Route path="/classrooms/:classroomId/manage-students" element={<StudentManagementPage />} />
+        <Route path="/dashboard/instructor/classrooms/:classroomId/assign-quizzes" element={<AssignQuizPage />} />
+        <Route path="/dashboard/instructor/classrooms" element={<InstructorClassroomsDashboard />} />
+        <Route path="/dashboard/instructor" element={<InstructorDashboard />} />
         <Route
-          path="/dashboard/instructor/quizzes/:quizId/edit"
-          element={<EditQuizForm />}
+          path="/create"
+          element={
+            sessionUser?.role === "instructor"
+              ? <CreateQuizForm />
+              : <Navigate to="/" replace />
+          }
         />
-        <Route
-          path="/dashboard/instructor/quizzes/:quizId/manage-questions"
-          element={<ManageQuestions />}
-        />
-        <Route
-          path="/quizzes/:quizId/add-question"
-          element={<CreateQuestionForm />}
-        />
-        <Route
-          path="/classrooms/:classroomId/manage-students"
-          element={<StudentManagementPage />}
-        />
-        <Route
-          path="/dashboard/instructor/classrooms/:classroomId/assign-quizzes"
-          element={<AssignQuizPage />}
-        />
-        <Route
-          path="/dashboard/instructor/classrooms"
-          element={<InstructorClassroomsDashboard />}
-        />
-        <Route
-          path="/dashboard/instructor"
-          element={<InstructorDashboard />}
-        />
-        <Route path="/create" element={
-          sessionUser?.role === "instructor" ? <CreateQuizForm /> : <Navigate to="/" />} 
-        />
+
         {/* ─── Public / Student routes ─────────────────────── */}
         <Route path="/" element={<QuizList />} />
         <Route path="/login" element={<LoginForm />} />
@@ -88,6 +74,9 @@ export default function App() {
         <Route path="/quizzes/:quizId" element={<TakeQuiz />} />
         <Route path="/dashboard/student" element={<StudentDashboard />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+
+        {/* ─── Profile ─────────────────────────────────────── */}
+        <Route path="/profile" element={<UserProfile />} />
       </Routes>
     </>
   );

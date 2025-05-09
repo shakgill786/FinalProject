@@ -9,7 +9,6 @@ export default function NavBar() {
   const sessionUser = useSelector((state) => state.session.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const openLogoutModal = () => setShowLogoutModal(true);
@@ -21,6 +20,12 @@ export default function NavBar() {
     closeLogoutModal();
     navigate("/login");
   };
+
+  // Capitalize first letter
+  const capitalized =
+    sessionUser?.username
+      ? sessionUser.username.charAt(0).toUpperCase() + sessionUser.username.slice(1)
+      : "";
 
   return (
     <>
@@ -53,7 +58,10 @@ export default function NavBar() {
             <NavLink to="/login" className="nav-item login-btn">🔐 Log In</NavLink>
           ) : (
             <>
-              <span className="nav-item welcome-text">👋 {sessionUser.username}</span>
+              {/* profile link with capitalized name */}
+              <Link to="/profile" className="nav-item welcome-text">
+                👋 {capitalized}
+              </Link>
               <button
                 onClick={openLogoutModal}
                 className="nav-item logout-btn"

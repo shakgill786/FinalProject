@@ -1,0 +1,65 @@
+.profile-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: sans-serif;
+  }
+  
+  .profile-container h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #1e3c72;
+  }
+  
+  .profile-section p {
+    font-size: 1.1rem;
+    margin: 8px 0;
+  }
+  
+  .password-section,
+  .quizzes-section {
+    margin-top: 2rem;
+  }
+  
+  .password-section h2,
+  .quizzes-section h2 {
+    margin-bottom: 0.5rem;
+    color: #1e3c72;
+  }
+  
+  .password-section input {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .update-password-btn {
+    background-color: #6c63ff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+  }
+  .update-password-btn:hover:not([disabled]) {
+    background-color: #564ee0;
+  }
+  
+  .quizzes-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  .quizzes-section li {
+    margin: 8px 0;
+  }
+  .quizzes-section a {
+    color: #0ea5e9;
+    text-decoration: none;
+  }
+  .quizzes-section a:hover {
+    text-decoration: underline;
+  }
