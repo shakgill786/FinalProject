@@ -1,3 +1,6 @@
+/* react-vite/src/components/Dashboard/FeedbackModal.css */
+
+/* Overlay backdrop */
 .feedback-modal-overlay {
   position: fixed;
   top: 0;
@@ -18,6 +21,7 @@
   pointer-events: none;
 }
 
+/* Modal container */
 .feedback-modal {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
@@ -25,14 +29,19 @@
   padding: 30px;
   width: 480px;
   max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   animation: fadeInScale 0.3s ease-in-out;
+  position: relative;
 }
 
+/* Modal closing animation */
 .feedback-modal.closing {
   animation: fadeOutScale 0.2s ease-in-out forwards;
 }
 
+/* Fade-in & fade-out keyframes */
 @keyframes fadeInScale {
   from {
     opacity: 0;
@@ -55,28 +64,39 @@
   }
 }
 
-
+/* Title */
 .feedback-modal h3 {
   font-size: 1.4rem;
-  margin-bottom: 15px;
+  margin: 0 0 15px;
   color: #1e3c72;
 }
 
-.quiz-selector {
+/* Quiz selector label */
+.quiz-selector,
+.quiz-select-label {
   display: block;
   margin-bottom: 1rem;
-  font-weight: bold;
+  font-weight: 600;
+  color: #333;
 }
 
-select {
+/* Select dropdown */
+.feedback-modal select {
   width: 100%;
-  padding: 8px;
+  padding: 8px 10px;
   margin-top: 5px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+.feedback-modal select:focus {
+  border-color: #6c63ff;
+  outline: none;
 }
 
-textarea {
+/* Textarea */
+.feedback-modal textarea {
   width: 100%;
   padding: 10px;
   font-size: 1rem;
@@ -84,23 +104,44 @@ textarea {
   border: 1px solid #ccc;
   resize: vertical;
   margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.feedback-modal textarea:focus {
+  border-color: #6c63ff;
+  outline: none;
 }
 
+/* Previous feedback block */
+.existing-feedback {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+}
+
+/* Buttons container */
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 8px;
 }
 
+/* Base button styles */
 .modal-buttons button {
-  padding: 8px 12px;
+  padding: 8px 14px;
   border: none;
   border-radius: 6px;
   font-weight: 600;
-  transition: 0.2s ease;
   cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.modal-buttons button:active {
+  transform: scale(0.98);
 }
 
+/* Specific button variants */
 .submit-btn {
   background-color: #6c63ff;
   color: white;
@@ -111,7 +152,7 @@ textarea {
 
 .cancel-btn {
   background-color: #ccc;
-  color: black;
+  color: #333;
 }
 .cancel-btn:hover {
   background-color: #aaa;
@@ -119,7 +160,7 @@ textarea {
 
 .edit-btn {
   background-color: #ffc107;
-  color: black;
+  color: #222;
 }
 .edit-btn:hover {
   background-color: #e0a800;
@@ -133,9 +174,38 @@ textarea {
   background-color: #c0392b;
 }
 
-.existing-feedback {
-  background: #fff;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+/* Scroll shadow at top/bottom when content overflows */
+.feedback-modal::before,
+.feedback-modal::after {
+  content: "";
+  position: sticky;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+.feedback-modal::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.9), transparent);
+}
+.feedback-modal::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+}
+
+.modal-exit-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.2s;
+  z-index: 1;
+}
+.modal-exit-btn:hover {
+  color: #e74c3c;
 }
