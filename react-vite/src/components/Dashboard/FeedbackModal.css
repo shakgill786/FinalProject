@@ -209,3 +209,11 @@
 .modal-exit-btn:hover {
   color: #e74c3c;
 }
+
+.done-btn {
+  background-color: #10b981;
+  color: white;
+}
+.done-btn:hover {
+  background-color: #059669;
+}
