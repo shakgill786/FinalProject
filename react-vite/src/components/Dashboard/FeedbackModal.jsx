@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+// react-vite/src/components/Dashboard/FeedbackModal.jsx
+
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   thunkCreateFeedback,
@@ -10,15 +12,19 @@ import "./FeedbackModal.css";
 
 export default function FeedbackModal({ student, classroom, onClose }) {
   const dispatch = useDispatch();
+
+  // Local state
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState("general");
   const [editMode, setEditMode] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const modalRef = useRef();
 
-  const feedback = useSelector((state) =>
-    Object.values(state.feedback).find(
+  // Pull all quizzes from Redux
+  const allQuizzes = useSelector((st) => Object.values(st.quizzes));
+
+  // Feedback for this student & quiz
+  const existingFeedback = useSelector((st) =>
+    Object.values(st.feedback).find(
       (f) =>
         f.student_id === student.id &&
         (selectedQuizId === "general"
@@ -27,82 +33,90 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     )
   );
 
+  // On mount or when student/class changes, reload feedback & assignments
+  const [classQuizIds, setClassQuizIds] = useState(new Set());
+  const [studentQuizIds, setStudentQuizIds] = useState(new Set());
+
   useEffect(() => {
     dispatch(thunkLoadFeedback(student.id));
     setEditMode(false);
     setContent("");
+    setSelectedQuizId("general");
 
-    const handleEsc = (e) => {
-      if (e.key === "Escape") triggerClose();
-    };
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, [dispatch, student.id, selectedQuizId]);
+    // Fetch classroom assignments endpoint, which returns both class‐level
+    // and student‐level assigned quiz IDs in student_assignments
+    fetch(`/api/classrooms/${classroom.id}/assignments`, {
+      credentials: "include",
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setClassQuizIds(new Set(data.class_assigned_quiz_ids || []));
+        const map = data.student_assignments || {};
+        const raw =
+          map[student.id] ?? map[String(student.id)] ?? [];
+        setStudentQuizIds(new Set(raw));
+      });
+  }, [dispatch, student.id, classroom.id]);
 
-  const triggerClose = () => {
-    setClosing(true);
-    setTimeout(() => {
-      onClose();
-    }, 200); // match with animation duration
-  };
+  // Union of both assignment types
+  const availableIds = new Set([
+    ...classQuizIds,
+    ...studentQuizIds,
+  ]);
 
+  // Filter the global quizzes list
+  const availableQuizzes = allQuizzes.filter((q) =>
+    availableIds.has(q.id)
+  );
+
+  // Handlers
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     const res = await dispatch(
       thunkCreateFeedback({
         student_id: student.id,
-        quiz_id: selectedQuizId === "general" ? null : Number(selectedQuizId),
+        quiz_id:
+          selectedQuizId === "general" ? null : Number(selectedQuizId),
         content: content.trim(),
       })
     );
-    if (!res.error) {
-      setContent("");
-      triggerClose();
-    } else {
-      alert("Error submitting feedback.");
-    }
     setSubmitting(false);
+    if (!res.error) onClose();
+    else alert("Error submitting feedback.");
   };
 
   const handleUpdate = async () => {
-    if (!feedback) return;
+    if (!existingFeedback) return;
     setSubmitting(true);
     const res = await dispatch(
-      thunkUpdateFeedback(feedback.id, content.trim())
+      thunkUpdateFeedback(existingFeedback.id, content.trim())
     );
-    if (!res.error) {
-      setEditMode(false);
-      setContent("");
-      triggerClose();
-    } else {
-      alert("Failed to update feedback.");
-    }
     setSubmitting(false);
+    if (!res.error) onClose();
+    else alert("Failed to update feedback.");
   };
 
   const handleDelete = async () => {
-    if (!feedback) return;
-    const confirmed = window.confirm("Are you sure you want to delete this feedback?");
-    if (!confirmed) return;
-    await dispatch(thunkDeleteFeedback(feedback.id));
-    setContent("");
-    triggerClose();
+    if (!existingFeedback) return;
+    if (!window.confirm("Delete this feedback?")) return;
+    await dispatch(thunkDeleteFeedback(existingFeedback.id));
+    onClose();
   };
 
   return (
-    <div className={`feedback-modal-overlay ${closing ? "fade-out" : ""}`}>
-      <div className={`feedback-modal ${closing ? "closing" : ""}`} ref={modalRef}>
+    <div className="feedback-modal-overlay">
+      <div className="feedback-modal">
         <h3>📝 Feedback for {student.username}</h3>
 
-        <label className="quiz-selector">
+        <label className="quiz-select-label">
           Select quiz:
           <select
             value={selectedQuizId}
             onChange={(e) => setSelectedQuizId(e.target.value)}
           >
             <option value="general">🗣️ General Feedback</option>
-            {classroom?.quizzes?.map((q) => (
+            {availableQuizzes.map((q) => (
               <option key={q.id} value={q.id}>
                 📘 {q.title}
               </option>
@@ -110,20 +124,27 @@ export default function FeedbackModal({ student, classroom, onClose }) {
           </select>
         </label>
 
-        {feedback && !editMode ? (
+        {existingFeedback && !editMode ? (
           <div className="existing-feedback">
             <strong>Previous Feedback:</strong>
-            <p>{feedback.content}</p>
+            <p>{existingFeedback.content}</p>
             <div className="modal-buttons">
-              <button className="edit-btn" onClick={() => {
-                setEditMode(true);
-                setContent(feedback.content);
-              }}>✏️ Edit</button>
-              <button className="delete-btn" onClick={handleDelete}>🗑️ Delete</button>
+              <button
+                onClick={() => {
+                  setEditMode(true);
+                  setContent(existingFeedback.content);
+                }}
+              >
+                ✏️ Edit
+              </button>
+              <button onClick={handleDelete}>🗑️ Delete</button>
             </div>
           </div>
         ) : (
-          <form onSubmit={editMode ? handleUpdate : handleSubmit}>
+          <form
+            onSubmit={editMode ? handleUpdate : handleSubmit}
+            className="feedback-form"
+          >
             <textarea
               placeholder="Write feedback here..."
               value={content}
@@ -132,8 +153,10 @@ export default function FeedbackModal({ student, classroom, onClose }) {
               required
             />
             <div className="modal-buttons">
-              <button type="button" className="cancel-btn" onClick={triggerClose}>❌ Cancel</button>
-              <button type="submit" className="submit-btn" disabled={submitting}>
+              <button type="button" onClick={onClose}>
+                ❌ Cancel
+              </button>
+              <button type="submit" disabled={submitting}>
                 {editMode ? "💾 Save" : "✅ Submit"}
               </button>
             </div>
