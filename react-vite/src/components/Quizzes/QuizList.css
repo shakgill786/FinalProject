@@ -161,3 +161,22 @@
   background: #00b8d4;
   transform: scale(1.05);
 }
+
+.hero-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+.hero-animation {
+  width: 200px;
+  height: 200px;
+}
+.hero-text {
+  text-align: left;
+}
+@media (max-width: 600px) {
+  .hero-banner { flex-direction: column; }
+  .hero-text { text-align: center; }
+}

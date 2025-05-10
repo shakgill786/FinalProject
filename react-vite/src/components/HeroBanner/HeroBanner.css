@@ -1,0 +1,53 @@
+.hero-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    padding: 60px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+  }
+  
+  .hero-text {
+    flex: 1 1 300px;
+    max-width: 50%;
+  }
+  
+  .hero-text h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+  }
+  
+  .hero-text p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+  
+  .hero-animation {
+    flex: 1 1 200px;
+    max-width: 40%;
+  }
+  
+  /* the lottie container comes wrapped in a div */
+  .hero-animation > div {
+    width: 100%;
+    height: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .hero-banner {
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+    .hero-text,
+    .hero-animation {
+      max-width: 100%;
+    }
+    .hero-text {
+      margin-top: 20px;
+    }
+  }
