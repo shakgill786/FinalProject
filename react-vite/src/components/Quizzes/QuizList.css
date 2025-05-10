@@ -60,13 +60,6 @@
   color: #777;
 }
 
-.quiz-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
-}
-
 .quiz-card {
   background: white;
   border: 2px solid #00aaff;

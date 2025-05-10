@@ -34,12 +34,14 @@ def create_quiz():
 @login_required
 def get_quizzes():
     if current_user.role == "student":
+        # classroom‐wide assignments
         class_ids      = [c.id for c in current_user.enrolled_classrooms]
         class_qs       = ClassroomQuiz.query.filter(
                             ClassroomQuiz.classroom_id.in_(class_ids)
                          ).all()
         class_quiz_ids = {cq.quiz_id for cq in class_qs}
 
+        # individual assignments (stored as QuizAttempt.status="assigned")
         indiv          = QuizAttempt.query.filter_by(
                             user_id=current_user.id, status="assigned"
                          ).all()
@@ -198,11 +200,17 @@ def log_quiz_attempt(quiz_id):
 @quiz_routes.route("/history", methods=["GET"])
 @login_required
 def get_student_history():
+    """
+    Only return **actual** quiz‐attempts (exclude any with status="assigned").
+    """
     if current_user.role != "student":
         return {"error": "Unauthorized"}, 403
 
     attempts = QuizAttempt.query \
-        .filter_by(user_id=current_user.id) \
+        .filter(
+            QuizAttempt.user_id == current_user.id,
+            QuizAttempt.status  != "assigned"
+        ) \
         .order_by(QuizAttempt.created_at.desc()) \
         .all()
 
@@ -211,7 +219,7 @@ def get_student_history():
         badges = []
         if a.score == 100:
             badges.append("Accuracy Ace")
-        if a.points >= len(a.quiz.questions) * 7:  # 70% of max (10 * # questions)
+        if a.points >= len(a.quiz.questions) * 7:  # 70% threshold
             badges.append("Fast Thinker")
 
         history.append({
@@ -244,6 +252,7 @@ def leaderboard():
         {"user_id": user_id, "username": username, "total_points": int(points or 0)}
         for user_id, username, points in results
     ]), 200
+
 
 @quiz_routes.route("/me/points", methods=["GET"])
 @login_required
