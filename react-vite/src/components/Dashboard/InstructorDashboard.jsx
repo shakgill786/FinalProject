@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { getAllQuizzes, deleteQuizThunk } from "../../redux/quizzes";
@@ -11,6 +11,11 @@ export default function InstructorDashboard() {
   const quizzes = useSelector((st) => Object.values(st.quizzes));
   const [loading, setLoading] = useState(true);
 
+  // Modal state for deleting a quiz
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteQuizId, setDeleteQuizId] = useState(null);
+  const [deleteQuizTitle, setDeleteQuizTitle] = useState("");
+
   useEffect(() => {
     if (sessionUser?.role === "instructor") {
       dispatch(getAllQuizzes()).finally(() => setLoading(false));
@@ -19,6 +24,25 @@ export default function InstructorDashboard() {
 
   if (!sessionUser) return null;
   if (loading) return <p className="loading-text">Loading…</p>;
+
+  const openDeleteModal = (quiz) => {
+    setDeleteQuizId(quiz.id);
+    setDeleteQuizTitle(quiz.title);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteQuizId) {
+      dispatch(deleteQuizThunk(deleteQuizId));
+      closeDeleteModal();
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteQuizId(null);
+    setDeleteQuizTitle("");
+  };
 
   return (
     <div className="dashboard-container glass-panel">
@@ -41,7 +65,9 @@ export default function InstructorDashboard() {
             <div key={q.id} className="quiz-card">
               <h2>{q.title}</h2>
               <p>{q.description}</p>
-              <p><strong>Grade:</strong> {q.grade_level || "N/A"}</p>
+              <p>
+                <strong>Grade:</strong> {q.grade_level || "N/A"}
+              </p>
               <div className="quiz-actions">
                 <Link to={`/quizzes/${q.id}`}>
                   <button className="view-quiz-button">📋 View</button>
@@ -53,12 +79,8 @@ export default function InstructorDashboard() {
                   <button className="edit-quiz-button">✏️ Edit</button>
                 </Link>
                 <button
-                  onClick={() => {
-                    if (window.confirm("Delete this quiz?")) {
-                      dispatch(deleteQuizThunk(q.id));
-                    }
-                  }}
                   className="delete-quiz-button"
+                  onClick={() => openDeleteModal(q)}
                 >
                   🗑️ Delete
                 </button>
@@ -71,6 +93,26 @@ export default function InstructorDashboard() {
       <div className="student-feedback-section">
         <InstructorStudentList />
       </div>
+
+      {showDeleteModal && (
+        <div className="confirm-modal-overlay" onClick={closeDeleteModal}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>🗑️ Delete Quiz?</h3>
+            <p>
+              Are you sure you want to delete the quiz{" "}
+              <strong>“{deleteQuizTitle}”</strong>?
+            </p>
+            <div className="confirm-modal-buttons">
+              <button className="cancel-btn" onClick={closeDeleteModal}>
+                ❌ Cancel
+              </button>
+              <button className="confirm-btn" onClick={confirmDelete}>
+                ✅ Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
+);
 }

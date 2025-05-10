@@ -15,7 +15,6 @@ import "./InstructorClassroomsDashboard.css";
 
 export default function InstructorClassroomsDashboard() {
   const [classrooms, setClassrooms] = useState([]);
-  const [assignmentsMap, setAssignmentsMap] = useState({});
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState("");
@@ -27,55 +26,40 @@ export default function InstructorClassroomsDashboard() {
   const [editingFeedbackId, setEditingFeedbackId] = useState(null);
   const [editingFeedbackContent, setEditingFeedbackContent] = useState("");
 
-  // delete‐confirmation modal
+  // Classroom delete‐confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteClassroomId, setDeleteClassroomId] = useState(null);
   const [deleteClassroomName, setDeleteClassroomName] = useState("");
+
+  // Feedback delete‐confirmation modal state
+  const [showFeedbackDeleteModal, setShowFeedbackDeleteModal] = useState(false);
+  const [feedbackToDelete, setFeedbackToDelete] = useState(null);
 
   const dispatch = useDispatch();
   const feedback = useSelector((st) => st.feedback);
   const user = useSelector((st) => st.session.user);
   const navigate = useNavigate();
 
-  // 1) Fetch classrooms + preload feedback + assignments
-  useEffect(() => {
-    (async function loadAll() {
-      const res = await fetch("/api/classrooms/?include=quizzes", {
-        credentials: "include",
-      });
-      if (!res.ok) {
-        setLoading(false);
-        return;
-      }
+  // Fetch classrooms & preload feedback
+  const fetchClassrooms = async () => {
+    const res = await fetch("/api/classrooms/?include=quizzes", {
+      credentials: "include",
+    });
+    if (res.ok) {
       const data = await res.json();
       setClassrooms(data);
+      data
+        .flatMap((cls) => cls.students || [])
+        .forEach((s) => dispatch(thunkLoadFeedback(s.id)));
+    }
+    setLoading(false);
+  };
 
-      // preload feedback for every student
-      data.flatMap((cls) => cls.students || []).forEach((s) => {
-        dispatch(thunkLoadFeedback(s.id));
-      });
+  useEffect(() => {
+    fetchClassrooms();
+  }, []);
 
-      // fetch assignments for each classroom
-      await Promise.all(
-        data.map(async (cls) => {
-          try {
-            const aRes = await fetch(
-              `/api/classrooms/${cls.id}/assignments`,
-              { credentials: "include" }
-            );
-            if (!aRes.ok) throw new Error();
-            const aData = await aRes.json();
-            setAssignmentsMap((m) => ({ ...m, [cls.id]: aData }));
-          } catch {
-            // ignore
-          }
-        })
-      );
-      setLoading(false);
-    })();
-  }, [dispatch]);
-
-  // 2) Classroom CRUD (create / update / delete) and drawer
+  // Classroom CRUD
   const createClassroom = async () => {
     if (!newName.trim()) return;
     await fetch("/api/csrf/restore", { credentials: "include" });
@@ -91,11 +75,7 @@ export default function InstructorClassroomsDashboard() {
     if (res.ok) {
       setNewName("");
       toast.success("🎉 Classroom created!");
-      // reload
-      setLoading(true);
-      setClassrooms([]);
-      setAssignmentsMap({});
-      dispatch(thunkLoadFeedback()); // force refetch
+      fetchClassrooms();
     } else {
       toast.error("❌ Failed to create classroom.");
     }
@@ -118,14 +98,13 @@ export default function InstructorClassroomsDashboard() {
       setEditDrawerOpen(false);
       setEditingId(null);
       setEditingName("");
-      // reload data
-      window.location.reload();
+      fetchClassrooms();
     } else {
       toast.error("❌ Update failed.");
     }
   };
 
-  // Delete via polished modal
+  // Classroom delete modal handlers
   const handleDeleteClick = (id, name) => {
     setDeleteClassroomId(id);
     setDeleteClassroomName(name);
@@ -141,8 +120,7 @@ export default function InstructorClassroomsDashboard() {
     if (res.ok) {
       toast.success("🗑️ Classroom deleted.");
       setShowDeleteModal(false);
-      // reload
-      window.location.reload();
+      fetchClassrooms();
     } else {
       toast.error("❌ Failed to delete classroom.");
     }
@@ -153,17 +131,28 @@ export default function InstructorClassroomsDashboard() {
     setDeleteClassroomName("");
   };
 
-  // Feedback‐specific handlers
-  const handleDeleteFeedback = async (fbId) => {
-    if (!window.confirm("Delete this feedback?")) return;
-    await dispatch(thunkDeleteFeedback(fbId));
-    toast.success("🗑️ Feedback deleted");
+  // Feedback delete modal handlers
+  const openFeedbackDeleteModal = (fb) => {
+    setFeedbackToDelete(fb);
+    setShowFeedbackDeleteModal(true);
   };
+  const confirmFeedbackDelete = async () => {
+    if (!feedbackToDelete) return;
+    await dispatch(thunkDeleteFeedback(feedbackToDelete.id));
+    toast.success("🗑️ Feedback deleted");
+    setShowFeedbackDeleteModal(false);
+    setFeedbackToDelete(null);
+    fetchClassrooms();
+  };
+  const cancelFeedbackDelete = () => {
+    setShowFeedbackDeleteModal(false);
+    setFeedbackToDelete(null);
+  };
+
+  // Unchanged feedback edit handlers
   const handleUpdateFeedback = async (fbId) => {
     if (!editingFeedbackContent.trim()) return;
-    const res = await dispatch(
-      thunkUpdateFeedback(fbId, editingFeedbackContent)
-    );
+    const res = await dispatch(thunkUpdateFeedback(fbId, editingFeedbackContent));
     if (!res.error) {
       setEditingFeedbackId(null);
       setEditingFeedbackContent("");
@@ -193,148 +182,139 @@ export default function InstructorClassroomsDashboard() {
         <p>No classrooms yet. Create one!</p>
       ) : (
         <div className="classroom-list">
-          {classrooms.map((cls) => {
-            const assignData = assignmentsMap[cls.id] || {
-              class_assigned_quiz_ids: [],
-              student_assignments: {},
-            };
-            const classIds = assignData.class_assigned_quiz_ids || [];
-            const studMap = assignData.student_assignments || {};
+          {classrooms.map((classroom) => (
+            <div key={classroom.id} className="classroom-card">
+              <h2>{classroom.name}</h2>
+              <p>
+                <strong>{classroom.students?.length || 0}</strong>{" "}
+                students enrolled
+              </p>
 
-            return (
-              <div key={cls.id} className="classroom-card">
-                <h2>{cls.name}</h2>
-                <p>
-                  <strong>{cls.students?.length || 0}</strong> students enrolled
-                </p>
-
-                <div className="classroom-buttons">
-                  <button
-                    onClick={() => {
-                      setEditingId(cls.id);
-                      setEditingName(cls.name);
-                      setEditDrawerOpen(true);
-                    }}
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigate(`/classrooms/${cls.id}/manage-students`)
-                    }
-                  >
-                    🎯 Manage Students
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigate(
-                        `/dashboard/instructor/classrooms/${cls.id}/assign-quizzes`
-                      )
-                    }
-                  >
-                    📝 Assign Quizzes
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(cls.id, cls.name)}
-                  >
-                    🗑️ Delete
-                  </button>
-                </div>
-
-                <div className="student-feedback-section">
-                  {cls.students?.map((student) => (
-                    <div
-                      key={student.id}
-                      className="student-feedback-card"
-                    >
-                      <h4>👧 {student.username}</h4>
-                      <button
-                        onClick={() => {
-                          setSelectedStudent(student);
-                          setSelectedClassroom(cls);
-                          setShowFeedbackModal(true);
-                        }}
-                      >
-                        💬 Give Feedback
-                      </button>
-
-                      {Object.values(feedback)
-                        .filter((f) => {
-                          if (f.student_id !== student.id) return false;
-                          if (f.quiz_id === null) return true; // general
-                          if (classIds.includes(f.quiz_id)) return true; // class‐wide
-                          // student‐only:
-                          return (
-                            studMap[student.id] &&
-                            studMap[student.id].includes(f.quiz_id)
-                          );
-                        })
-                        .map((f) => (
-                          <div key={f.id} className="feedback-entry">
-                            <strong>
-                              {f.quiz_title || "🗣️ General Feedback"}
-                            </strong>
-
-                            {editingFeedbackId === f.id ? (
-                              <>
-                                <textarea
-                                  value={editingFeedbackContent}
-                                  onChange={(e) =>
-                                    setEditingFeedbackContent(e.target.value)
-                                  }
-                                  rows={3}
-                                />
-                                <button
-                                  onClick={() => handleUpdateFeedback(f.id)}
-                                >
-                                  💾 Save
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setEditingFeedbackId(null);
-                                    setEditingFeedbackContent("");
-                                  }}
-                                >
-                                  ❌ Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <p>{f.content}</p>
-                                <small>
-                                  {new Date(f.created_at).toLocaleString()}
-                                </small>
-                                {user?.role === "instructor" && (
-                                  <div className="feedback-buttons">
-                                    <button
-                                      onClick={() => {
-                                        setEditingFeedbackId(f.id);
-                                        setEditingFeedbackContent(f.content);
-                                      }}
-                                    >
-                                      ✏️ Edit
-                                    </button>
-                                    <button
-                                      onClick={() => handleDeleteFeedback(f.id)}
-                                    >
-                                      🗑️ Delete
-                                    </button>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        ))}
-                    </div>
-                  ))}
-                </div>
+              <div className="classroom-buttons">
+                <button
+                  onClick={() => {
+                    setEditingId(classroom.id);
+                    setEditingName(classroom.name);
+                    setEditDrawerOpen(true);
+                  }}
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  onClick={() =>
+                    navigate(`/classrooms/${classroom.id}/manage-students`)
+                  }
+                >
+                  🎯 Manage Students
+                </button>
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/dashboard/instructor/classrooms/${classroom.id}/assign-quizzes`
+                    )
+                  }
+                >
+                  📝 Assign Quizzes
+                </button>
+                <button
+                  onClick={() =>
+                    handleDeleteClick(classroom.id, classroom.name)
+                  }
+                >
+                  🗑️ Delete
+                </button>
               </div>
-            );
-          })}
+
+              {/* Student Feedback Section */}
+              <div className="student-feedback-section">
+                {classroom.students?.map((student) => (
+                  <div
+                    key={student.id}
+                    className="student-feedback-card"
+                  >
+                    <h4>👧 {student.username}</h4>
+                    <button
+                      onClick={() => {
+                        setSelectedStudent(student);
+                        setSelectedClassroom(classroom);
+                        setShowFeedbackModal(true);
+                      }}
+                    >
+                      💬 Give Feedback
+                    </button>
+
+                    {Object.values(feedback)
+                      .filter((f) => {
+                        if (f.student_id !== student.id) return false;
+                        // general or class‐wide or student‐only:
+                        const classIds = classroom.quizzes?.map((q) => q.id) || [];
+                        return (
+                          f.quiz_id === null ||
+                          classIds.includes(f.quiz_id)
+                        );
+                      })
+                      .map((f) => (
+                        <div key={f.id} className="feedback-entry">
+                          <strong>
+                            {f.quiz_title || "🗣️ General Feedback"}
+                          </strong>
+                          {editingFeedbackId === f.id ? (
+                            <>
+                              <textarea
+                                value={editingFeedbackContent}
+                                onChange={(e) =>
+                                  setEditingFeedbackContent(e.target.value)
+                                }
+                                rows={3}
+                              />
+                              <button onClick={() => handleUpdateFeedback(f.id)}>
+                                💾 Save
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingFeedbackId(null);
+                                  setEditingFeedbackContent("");
+                                }}
+                              >
+                                ❌ Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <p>{f.content}</p>
+                              <small>
+                                {new Date(f.created_at).toLocaleString()}
+                              </small>
+                              {user?.role === "instructor" && (
+                                <div className="feedback-buttons">
+                                  <button
+                                    onClick={() => {
+                                      setEditingFeedbackId(f.id);
+                                      setEditingFeedbackContent(f.content);
+                                    }}
+                                  >
+                                    ✏️ Edit
+                                  </button>
+                                  <button
+                                    onClick={() => openFeedbackDeleteModal(f)}
+                                  >
+                                    🗑️ Delete
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* edit‐drawer */}
+      {/* Edit Drawer */}
       <div className={`edit-drawer ${editDrawerOpen ? "open" : ""}`}>
         <h3>✏️ Edit Classroom</h3>
         <input
@@ -357,28 +337,12 @@ export default function InstructorClassroomsDashboard() {
         </div>
       </div>
 
-      {/* feedback modal */}
-      {showFeedbackModal && (
-        <FeedbackModal
-          student={selectedStudent}
-          classroom={{
-            id: selectedClassroom.id,
-            quizzes: selectedClassroom.quizzes || [],
-          }}
-          onClose={() => {
-            setShowFeedbackModal(false);
-            setSelectedStudent(null);
-            setSelectedClassroom(null);
-          }}
-        />
-      )}
-
-      {/* delete confirmation modal */}
+      {/* Classroom Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="confirm-modal-overlay">
           <div className="confirm-modal">
             <p>
-              Are you sure you want to delete “
+              Are you sure you want to delete the classroom “
               <strong>{deleteClassroomName}</strong>”?
             </p>
             <div className="confirm-modal-buttons">
@@ -391,6 +355,45 @@ export default function InstructorClassroomsDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Feedback Delete Confirmation Modal */}
+      {showFeedbackDeleteModal && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal">
+            <p>
+              Delete feedback for “
+              <strong>{feedbackToDelete?.quiz_title || "General Feedback"}</strong>”?
+            </p>
+            <div className="confirm-modal-buttons">
+              <button className="cancel-btn" onClick={cancelFeedbackDelete}>
+                ❌ Cancel
+              </button>
+              <button
+                className="confirm-btn"
+                onClick={confirmFeedbackDelete}
+              >
+                ✅ Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && selectedStudent && selectedClassroom && (
+        <FeedbackModal
+          student={selectedStudent}
+          classroom={{
+            id: selectedClassroom.id,
+            quizzes: selectedClassroom.quizzes || [],
+          }}
+          onClose={() => {
+            setShowFeedbackModal(false);
+            setSelectedStudent(null);
+            setSelectedClassroom(null);
+          }}
+        />
       )}
     </div>
   );
