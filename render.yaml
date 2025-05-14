@@ -1,29 +1,19 @@
 services:
-
-  # ── Flask API ─────────────────────────────────────────────
   - type: web
-    name: knowbie-backend
+    name: knowbie
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: cd app && gunicorn app:app
+
+    buildCommand: |
+      pip install -r requirements.txt
+      cd react-vite
+      npm install
+      npm run build
+
+    startCommand: gunicorn app:app
+
     envVars:
       - key: DATABASE_URL
         sync: false
       - key: SECRET_KEY
-        sync: false
-
-  # ── React Frontend ────────────────────────────────────────
-  - type: static-site
-    name: knowbie-frontend
-    env: static
-    plan: free
-    buildCommand: |
-      cd react-vite
-      npm install
-      npm run build
-    publishPath: react-vite/dist
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://knowbie-backend.onrender.com/api
         sync: false
