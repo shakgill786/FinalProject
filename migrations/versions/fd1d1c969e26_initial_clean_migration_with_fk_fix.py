@@ -78,7 +78,7 @@ def upgrade():
     sa.Column('options', sa.PickleType(), nullable=False),
     sa.Column('answer', sa.String(length=100), nullable=False),
     sa.Column('quiz_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['quiz_id'], ['public.quizzes.id']),  # 👈 IMPORTANT!
+    sa.ForeignKeyConstraint(['quiz_id'], ['public.quizzes.id']),  
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('quiz_attempts',
