@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.sql import func
-from app.models.db import db, environment, SCHEMA
+from app.models.db import db, environment, SCHEMA, add_prefix_for_prod
 import pytz
 
 class Feedback(db.Model):
@@ -10,13 +10,12 @@ class Feedback(db.Model):
         __table_args__ = {"schema": SCHEMA}
 
     id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=True)  # ✅ Now optional
+    teacher_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("users.id")), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("users.id")), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("quizzes.id")), nullable=True)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now())
 
-    # Relationships
     teacher = db.relationship("User", foreign_keys=[teacher_id], backref="given_feedback")
     student = db.relationship("User", foreign_keys=[student_id], backref="received_feedback")
     quiz = db.relationship("Quiz", back_populates="feedbacks")
@@ -34,4 +33,4 @@ class Feedback(db.Model):
             "teacher_name": self.teacher.username if self.teacher else None,
             "student_name": self.student.username if self.student else None,
             "quiz_title": self.quiz.title if self.quiz else "General Feedback",
-    }
+        }

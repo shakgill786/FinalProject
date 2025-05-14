@@ -1,8 +1,8 @@
-"""Initial clean migration with FK fix
+"""Recreate clean schema with correct FK
 
-Revision ID: fd1d1c969e26
+Revision ID: 9d8e06d86232
 Revises: 
-Create Date: 2025-05-14 10:02:53.504799
+Create Date: 2025-05-14 11:48:29.963849
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'fd1d1c969e26'
+revision = '9d8e06d86232'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -78,7 +78,7 @@ def upgrade():
     sa.Column('options', sa.PickleType(), nullable=False),
     sa.Column('answer', sa.String(length=100), nullable=False),
     sa.Column('quiz_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['quiz_id'], ['public.quizzes.id']),  
+    sa.ForeignKeyConstraint(['quiz_id'], ['quizzes.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('quiz_attempts',

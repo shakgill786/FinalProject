@@ -12,12 +12,12 @@ class Quiz(db.Model):
     description = db.Column(db.String(255))
     grade_level = db.Column(db.String(20))
     instructor_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("users.id")))
+
     questions = db.relationship("Question", back_populates="quiz", cascade="all, delete-orphan")
-    
-    # New: relationship for quiz attempts
     quiz_attempts = db.relationship("QuizAttempt", back_populates="quiz", cascade="all, delete-orphan")
     classroom_assignments = db.relationship("ClassroomQuiz", back_populates="quiz", cascade="all, delete-orphan")
     feedbacks = db.relationship("Feedback", back_populates="quiz", cascade="all, delete-orphan")
+
     def to_dict(self):
         return {
             "id": self.id,

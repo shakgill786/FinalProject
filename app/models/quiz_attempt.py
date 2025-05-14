@@ -13,7 +13,7 @@ class QuizAttempt(db.Model):
     score = db.Column(db.Float, nullable=False)
     points = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    status = db.Column(db.String(20), default="completed") 
+    status = db.Column(db.String(20), default="completed")
 
     user = db.relationship("User", back_populates="quiz_attempts")
     quiz = db.relationship("Quiz", back_populates="quiz_attempts")

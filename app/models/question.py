@@ -10,7 +10,8 @@ class Question(db.Model):
     question_text = db.Column(db.String(255), nullable=False)
     options = db.Column(db.PickleType, nullable=False)
     answer = db.Column(db.String(100), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("quizzes.id")), nullable=False)    
+    quiz_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("quizzes.id")), nullable=False)
+
     quiz = db.relationship("Quiz", back_populates="questions")
 
     def to_dict(self):
