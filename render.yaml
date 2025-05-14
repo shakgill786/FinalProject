@@ -4,12 +4,21 @@ services:
     env: python
     plan: free
 
-    buildCommand: pip install -r requirements.txt
+    # 1) install Python deps; 2) build your React app
+    buildCommand: |
+      pip install --no-cache-dir -r requirements.txt
+      cd react-vite
+      npm ci
+      npm run build
 
-    startCommand: gunicorn app:app
+    # Run your migrations then launch with Gunicorn
+    startCommand: |
+      flask --app app db upgrade
+      flask --app app seed all
+      python -m gunicorn --bind 0.0.0.0:$PORT app:app
 
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase: knowbie-db
       - key: SECRET_KEY
         sync: false
