@@ -1,8 +1,8 @@
-"""Recreate clean schema with correct FK
+"""fresh start
 
-Revision ID: 9d8e06d86232
+Revision ID: 7440bfe4f742
 Revises: 
-Create Date: 2025-05-14 11:48:29.963849
+Create Date: 2025-05-14 13:54:53.766452
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9d8e06d86232'
+revision = '7440bfe4f742'
 down_revision = None
 branch_labels = None
 depends_on = None
