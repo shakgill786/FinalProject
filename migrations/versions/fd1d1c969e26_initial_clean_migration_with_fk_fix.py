@@ -1,8 +1,8 @@
-"""Initial migration after reset
+"""Initial clean migration with FK fix
 
-Revision ID: bb59e9c210ea
+Revision ID: fd1d1c969e26
 Revises: 
-Create Date: 2025-05-14 08:46:36.580637
+Create Date: 2025-05-14 10:02:53.504799
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'bb59e9c210ea'
+revision = 'fd1d1c969e26'
 down_revision = None
 branch_labels = None
 depends_on = None
