@@ -1,4 +1,3 @@
-// react-vite/src/components/Quizzes/ManageQuestions.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getCookie } from "../../utils/csrf";
