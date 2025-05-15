@@ -1,15 +1,18 @@
+// react-vite/src/components/Quizzes/ManageQuestions.jsx
+
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getCookie } from "../../utils/csrf";
 import "./ManageQuestions.css";
 
 export default function ManageQuestions() {
   const { quizId } = useParams();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
-  const [newQ, setNewQ]           = useState("");
-  const [options, setOptions]     = useState(["", ""]);
-  const [answer, setAnswer]       = useState("");
-  const [errors, setErrors]       = useState([]);
+  const [newQ, setNewQ] = useState("");
+  const [options, setOptions] = useState(["", ""]);
+  const [answer, setAnswer] = useState("");
+  const [errors, setErrors] = useState([]);
 
   const fetchQuestions = async () => {
     const res = await fetch(`/api/quizzes/${quizId}/questions`, {
@@ -25,7 +28,9 @@ export default function ManageQuestions() {
   const addOption = () => setOptions([...options, ""]);
 
   const changeOption = (i, val) => {
-    const o = [...options]; o[i] = val; setOptions(o);
+    const o = [...options];
+    o[i] = val;
+    setOptions(o);
   };
 
   const handleCreate = async () => {
@@ -37,7 +42,7 @@ export default function ManageQuestions() {
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken":   getCookie("csrf_token"),
+        "X-CSRFToken": getCookie("csrf_token"),
       },
       body: JSON.stringify({
         question_text: newQ.trim(),
@@ -68,47 +73,70 @@ export default function ManageQuestions() {
   };
 
   return (
-    <div className="manage-questions">
+    <div className="manage-questions-container">
       <h2>Manage Questions for Quiz #{quizId}</h2>
+
       {errors.length > 0 && (
         <ul className="form-errors">
-          {errors.map((e,i)=><li key={i}>{e}</li>)}
+          {errors.map((e, i) => (
+            <li key={i}>{e}</li>
+          ))}
         </ul>
       )}
 
-      <div className="new-question">
+      <div className="new-question-form">
         <textarea
-          placeholder="Question text"
+          placeholder="Enter your question..."
           value={newQ}
           onChange={(e) => setNewQ(e.target.value)}
         />
+
         {options.map((opt, i) => (
           <input
             key={i}
-            placeholder={`Option ${i+1}`}
+            placeholder={`Option ${i + 1}`}
             value={opt}
             onChange={(e) => changeOption(i, e.target.value)}
           />
         ))}
-        <button onClick={addOption}>➕ Add Option</button>
+
+        <button className="add-option" onClick={addOption}>
+          ➕ Add Option
+        </button>
+
         <input
-          placeholder="Answer"
+          placeholder="Correct Answer"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
         />
-        <button onClick={handleCreate}>Create Question</button>
+
+        <button className="create-btn" onClick={handleCreate}>
+          ✅ Create Question
+        </button>
       </div>
 
       <ul className="question-list">
         {questions.map((q) => (
-          <li key={q.id}>
+          <li key={q.id} className="question-card">
             <strong>{q.question_text}</strong>
-            <ul>{q.options.map((o,i)=><li key={i}>{o}</li>)}</ul>
-            <em>Answer: {q.answer}</em>
-            <button onClick={() => handleDelete(q.id)}>🗑️ Delete</button>
+            <ul className="options-list">
+              {q.options.map((opt, i) => (
+                <li key={i}>{opt}</li>
+              ))}
+            </ul>
+            <p className="answer">
+              <em>Answer: {q.answer}</em>
+            </p>
+            <button className="delete-btn" onClick={() => handleDelete(q.id)}>
+              🗑️ Delete
+            </button>
           </li>
         ))}
       </ul>
+
+      <button className="done-btn" onClick={() => navigate("/dashboard/instructor")}>
+        ✅ Done
+      </button>
     </div>
   );
 }

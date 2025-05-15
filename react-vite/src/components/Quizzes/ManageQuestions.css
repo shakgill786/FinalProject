@@ -1,103 +1,99 @@
-/* Updated ManageQuestions.css */
+/* react-vite/src/components/Quizzes/ManageQuestions.css */
 
-.manage-questions {
+.manage-questions-container {
   max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', sans-serif;
+  background: #ffffffcc;
+  backdrop-filter: blur(6px);
+  border-radius: 20px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
+  font-family: "Segoe UI", sans-serif;
 }
 
-.manage-questions h2 {
+.manage-questions-container h2 {
   text-align: center;
-  font-size: 1.8rem;
   margin-bottom: 1.5rem;
+  font-size: 1.6rem;
   color: #333;
 }
 
 .form-errors {
-  color: red;
-  list-style: disc;
-  margin-left: 1rem;
+  background: #ffe5e5;
+  border: 1px solid #e02d2d;
+  color: #b10000;
+  padding: 0.75rem;
   margin-bottom: 1rem;
-}
-
-.new-question {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-}
-
-.new-question textarea,
-.new-question input {
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
   border-radius: 8px;
+  list-style: square inside;
+}
+
+.new-question-form textarea,
+.new-question-form input {
+  display: block;
   width: 100%;
-  box-sizing: border-box;
-}
-
-.new-question button {
-  padding: 0.6rem 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
   font-size: 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-  width: fit-content;
 }
 
-.new-question button:hover {
-  background-color: #0056b3;
+.add-option,
+.create-btn,
+.done-btn,
+.delete-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.add-option {
+  background-color: #e2e8f0;
+}
+
+.create-btn {
+  background-color: #38b2ac;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.done-btn {
+  background-color: #805ad5;
+  color: white;
+  display: block;
+  margin: 2rem auto 0 auto;
 }
 
 .question-list {
+  margin-top: 2rem;
   list-style: none;
-  padding: 0;
+  padding-left: 0;
 }
 
-.question-list li {
-  margin-bottom: 1.5rem;
-  background: #f7f7f7;
+.question-card {
+  background: #f4f4f4;
+  border-radius: 12px;
   padding: 1rem;
-  border-radius: 10px;
-  border-left: 4px solid #007bff;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-.question-list strong {
-  font-size: 1.1rem;
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.question-list ul {
+.options-list {
+  margin: 0.5rem 0;
   padding-left: 1.5rem;
-  margin-bottom: 0.5rem;
 }
 
-.question-list em {
-  display: block;
+.answer {
   font-style: italic;
-  color: #333;
-  margin-bottom: 0.5rem;
+  color: #444;
 }
 
-.question-list button {
-  background-color: #dc3545;
+.delete-btn {
+  background-color: #e53e3e;
   color: white;
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.question-list button:hover {
-  background-color: #a71d2a;
 }
