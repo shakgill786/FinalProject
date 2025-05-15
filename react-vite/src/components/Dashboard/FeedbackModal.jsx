@@ -13,16 +13,13 @@ import "./FeedbackModal.css";
 export default function FeedbackModal({ student, classroom, onClose }) {
   const dispatch = useDispatch();
 
-  // form state
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState("general");
   const [editMode, setEditMode] = useState(false);
 
-  // dropdown options
   const [availableQuizzes, setAvailableQuizzes] = useState([]);
 
-  // reload feedback when student changes
   useEffect(() => {
     dispatch(thunkLoadFeedback(student.id));
     setEditMode(false);
@@ -30,7 +27,6 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     setSelectedQuizId("general");
   }, [dispatch, student.id]);
 
-  // build the “Select quiz” dropdown from class + student assignments
   useEffect(() => {
     async function loadAvailable() {
       try {
@@ -59,7 +55,6 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     loadAvailable();
   }, [classroom.id, classroom.quizzes, student.id]);
 
-  // existing feedback for this student + quiz
   const existingFeedback = useSelector((st) =>
     Object.values(st.feedback).find(
       (f) =>
@@ -70,7 +65,6 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     )
   );
 
-  // create or update on submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -85,17 +79,18 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     const res = await dispatch(action);
     setSubmitting(false);
     if (!res.error) {
+      await dispatch(thunkLoadFeedback(student.id)); // ✅ Force refresh
       onClose();
     } else {
       alert("Error saving feedback.");
     }
   };
 
-  // delete existing
   const handleDelete = async () => {
     if (!existingFeedback) return;
     if (!window.confirm("Delete this feedback?")) return;
     await dispatch(thunkDeleteFeedback(existingFeedback.id));
+    await dispatch(thunkLoadFeedback(student.id)); // ✅ Force refresh
     onClose();
   };
 
@@ -141,7 +136,6 @@ export default function FeedbackModal({ student, classroom, onClose }) {
               >
                 🗑️ Delete
               </button>
-              {/* ← NEW “Done” BUTTON */}
               <button
                 type="button"
                 className="done-btn"
