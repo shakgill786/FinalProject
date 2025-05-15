@@ -1,8 +1,7 @@
-// react-vite/src/components/Quizzes/CreateQuizForm.jsx
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../../utils/csrf"; // ✅ Add this import
+import { toast } from "react-toastify";
+import { getCookie } from "../../utils/csrf";
 import "./CreateQuizForm.css";
 
 export default function CreateQuizForm() {
@@ -10,22 +9,19 @@ export default function CreateQuizForm() {
   const [description, setDescription] = useState("");
   const [gradeLevel, setGradeLevel] = useState("");
   const [errors, setErrors] = useState([]);
-  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors([]);
-    setSuccess(false);
 
-    // 🔁 Always restore CSRF before POST
     await fetch("/api/csrf/restore", { credentials: "include" });
 
     const res = await fetch("/api/quizzes/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrf_token"), // ✅ Add this
+        "X-CSRFToken": getCookie("csrf_token"),
       },
       credentials: "include",
       body: JSON.stringify({
@@ -36,10 +32,8 @@ export default function CreateQuizForm() {
     });
 
     if (res.ok) {
-      setTitle("");
-      setDescription("");
-      setGradeLevel("");
-      setSuccess(true);
+      toast.success("✅ Quiz created!");
+      navigate("/dashboard/instructor");
     } else {
       try {
         const data = await res.json();
@@ -61,7 +55,6 @@ export default function CreateQuizForm() {
           ))}
         </ul>
       )}
-      {success && <p className="success-message">✅ Quiz created successfully!</p>}
 
       <form onSubmit={handleSubmit}>
         <label>

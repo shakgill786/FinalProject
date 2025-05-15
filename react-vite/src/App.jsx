@@ -37,7 +37,6 @@ export default function App() {
       .catch(console.error);
   }, [dispatch]);
 
-  // Auto-redirect logged-in users off login/signup
   if (sessionUser && ["/login", "/signup"].includes(location.pathname)) {
     const dest =
       sessionUser.role === "instructor"
