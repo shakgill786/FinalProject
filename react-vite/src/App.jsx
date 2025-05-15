@@ -1,11 +1,7 @@
+
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Routes,
-  Route,
-  Navigate,
-  useLocation
-} from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import NavBar from "./components/NavBar/NavBar";
 import QuizList from "./components/Quizzes/QuizList";
@@ -23,6 +19,7 @@ import Leaderboard from "./components/Dashboard/Leaderboard";
 import LoginForm from "./components/Auth/LoginForm";
 import SignupForm from "./components/Auth/SignupForm";
 import UserProfile from "./components/Dashboard/UserProfile";
+import About from "./components/About/About";
 
 import { thunkAuthenticate } from "./redux/session";
 
@@ -73,6 +70,7 @@ export default function App() {
         <Route path="/quizzes/:quizId" element={<TakeQuiz />} />
         <Route path="/dashboard/student" element={<StudentDashboard />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/about" element={<About />} />
 
         {/* ─── Profile ─────────────────────────────────────── */}
         <Route path="/profile" element={<UserProfile />} />

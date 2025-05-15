@@ -123,20 +123,21 @@
 /* Buttons container */
 .modal-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
   margin-top: 8px;
 }
 
-/* Base button styles */
 .modal-buttons button {
-  padding: 8px 14px;
+  flex: 1;
+  min-width: 100px;
+  max-width: 120px;
+  padding: 10px 0;
   border: none;
   border-radius: 6px;
   font-weight: 600;
-  cursor: pointer;
-  min-width: 100px;
   text-align: center;
+  cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
 }
 .modal-buttons button:active {
