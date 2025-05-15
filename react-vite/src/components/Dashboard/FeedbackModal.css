@@ -135,6 +135,8 @@
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
+  min-width: 100px;
+  text-align: center;
   transition: background-color 0.2s, transform 0.1s;
 }
 .modal-buttons button:active {
