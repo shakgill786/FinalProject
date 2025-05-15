@@ -246,12 +246,10 @@ export default function InstructorClassroomsDashboard() {
                     {Object.values(feedback)
                       .filter((f) => {
                         if (f.student_id !== student.id) return false;
-                        // general or class‐wide or student‐only:
-                        const classIds = classroom.quizzes?.map((q) => q.id) || [];
-                        return (
-                          f.quiz_id === null ||
-                          classIds.includes(f.quiz_id)
-                        );
+                        if (f.quiz_id === null) return true;
+                        const classQuizIds = classroom.quizzes?.map((q) => q.id) || [];
+                        const studentQuizIds = f.student_quiz_ids || [];
+                        return classQuizIds.includes(f.quiz_id) || studentQuizIds.includes(f.quiz_id);
                       })
                       .map((f) => (
                         <div key={f.id} className="feedback-entry">
