@@ -19,7 +19,7 @@
   cursor: pointer;
 }
 
-/* 🧱 Button container layout */
+
 .modal-buttons {
   display: flex;
   justify-content: center;
@@ -30,7 +30,7 @@
   margin-top: 16px;
 }
 
-/* 🎯 Uniform button style */
+
 .modal-buttons button {
   flex: 0 0 100px;
   height: 42px;
@@ -45,7 +45,6 @@
   align-items: center;
 }
 
-/* ✏️ Edit Button */
 .edit-btn {
   background-color: #ffc107;
   color: #222;
@@ -54,7 +53,6 @@
   background-color: #e0a800;
 }
 
-/* 🗑️ Delete Button */
 .delete-btn {
   background-color: #e74c3c;
   color: white;
@@ -63,7 +61,6 @@
   background-color: #c0392b;
 }
 
-/* ✅ Done Button */
 .done-btn {
   background-color: #10b981;
   color: white;

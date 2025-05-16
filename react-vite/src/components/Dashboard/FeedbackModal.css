@@ -122,22 +122,26 @@
 
 /* Buttons container */
 .modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 8px;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+  width: 100% !important;
 }
 
 .modal-buttons button {
-  flex: 1;
-  min-width: 100px;
-  max-width: 120px;
-  padding: 10px 0;
+  width: 100px !important;
+  height: 42px !important;
+  padding: 10px 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600;
   border: none;
   border-radius: 6px;
-  font-weight: 600;
-  text-align: center;
   cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   transition: background-color 0.2s, transform 0.1s;
 }
 .modal-buttons button:active {
