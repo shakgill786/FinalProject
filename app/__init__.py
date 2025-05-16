@@ -65,8 +65,7 @@ def serve_react(path):
     if path.startswith("api"):
         return jsonify({"error": "Not found"}), 404
 
-    file_path = os.path.join(app.static_folder, path)
-    if os.path.exists(file_path) and os.path.isfile(file_path):
+    try:
         return send_from_directory(app.static_folder, path)
-
-    return send_from_directory(app.static_folder, "index.html")
+    except:
+        return send_from_directory(app.static_folder, "index.html")
