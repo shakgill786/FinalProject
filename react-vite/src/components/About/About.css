@@ -1,16 +1,16 @@
 .about-page {
-    max-width: 800px;
-    margin: 3rem auto;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    font-size: 1.1rem;
-    line-height: 1.6;
-  }
-  
-  .about-page h1 {
-    text-align: center;
-    color: #1e3a8a;
-    margin-bottom: 1.5rem;
-  }
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about-page h1 {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+}

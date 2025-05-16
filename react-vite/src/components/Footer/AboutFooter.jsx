@@ -8,7 +8,7 @@ export default function AboutFooter() {
       <div className="footer-content">
         <p>
           Created by <strong>Shak Gillani</strong> — <a
-            href="https://www.linkedin.com/in/shakeelgillani"
+            href="https://www.linkedin.com/in/shakeel-gillani-4a11515b/"
             target="_blank"
             rel="noreferrer"
           >

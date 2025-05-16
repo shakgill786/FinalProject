@@ -1,5 +1,3 @@
-// react-vite/src/App.jsx
-
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
@@ -37,7 +35,6 @@ export default function App() {
       .catch(console.error);
   }, [dispatch]);
 
-  // Redirect logged-in users off login/signup
   if (sessionUser && ["/login", "/signup"].includes(location.pathname)) {
     const dest =
       sessionUser.role === "instructor"
