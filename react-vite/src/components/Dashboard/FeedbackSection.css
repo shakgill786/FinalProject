@@ -6,20 +6,23 @@
   font-size: 0.9rem;
   color: #333;
 }
-
 .feedback-entry {
   margin-bottom: 8px;
   padding: 6px;
   background-color: #f9f9f9;
   border-radius: 4px;
 }
-
 .delete-feedback-btn {
   margin-left: 10px;
   color: red;
   cursor: pointer;
 }
-
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
 .modal-buttons button {
   padding: 10px 0;
   width: 100px;
@@ -33,8 +36,6 @@
   transition: background-color 0.2s, transform 0.1s;
   display: inline-block;
 }
-
-/* Individual button variants */
 .edit-btn {
   background-color: #ffc107;
   color: #222;
@@ -42,7 +43,6 @@
 .edit-btn:hover {
   background-color: #e0a800;
 }
-
 .delete-btn {
   background-color: #e74c3c;
   color: white;
@@ -50,7 +50,6 @@
 .delete-btn:hover {
   background-color: #c0392b;
 }
-
 .done-btn {
   background-color: #10b981;
   color: white;
