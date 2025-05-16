@@ -1,9 +1,12 @@
+// react-vite/src/App.jsx
 
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import NavBar from "./components/NavBar/NavBar";
+import AboutFooter from "./components/Footer/AboutFooter";
+
 import QuizList from "./components/Quizzes/QuizList";
 import TakeQuiz from "./components/Quizzes/TakeQuiz";
 import CreateQuizForm from "./components/Quizzes/CreateQuizForm";
@@ -34,6 +37,7 @@ export default function App() {
       .catch(console.error);
   }, [dispatch]);
 
+  // Redirect logged-in users off login/signup
   if (sessionUser && ["/login", "/signup"].includes(location.pathname)) {
     const dest =
       sessionUser.role === "instructor"
@@ -45,8 +49,9 @@ export default function App() {
   return (
     <>
       <NavBar />
+
       <Routes>
-        {/* ─── Instructor routes ───────────────────────────── */}
+        {/* ─── Instructor Routes ───────────────────────────── */}
         <Route path="/dashboard/instructor/quizzes/:quizId/edit" element={<EditQuizForm />} />
         <Route path="/dashboard/instructor/quizzes/:quizId/manage-questions" element={<ManageQuestions />} />
         <Route path="/quizzes/:quizId/add-question" element={<CreateQuestionForm />} />
@@ -63,7 +68,7 @@ export default function App() {
           }
         />
 
-        {/* ─── Public / Student routes ─────────────────────── */}
+        {/* ─── Public / Student Routes ─────────────────────── */}
         <Route path="/" element={<QuizList />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
@@ -75,6 +80,8 @@ export default function App() {
         {/* ─── Profile ─────────────────────────────────────── */}
         <Route path="/profile" element={<UserProfile />} />
       </Routes>
+
+      <AboutFooter />
     </>
   );
 }

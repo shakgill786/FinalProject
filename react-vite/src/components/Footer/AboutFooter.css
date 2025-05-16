@@ -1,0 +1,21 @@
+/* react-vite/src/components/Footer/AboutFooter.css */
+
+.about-footer {
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid #ddd;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 2rem;
+  }
+  
+  .footer-content a {
+    color: #7c3aed;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .footer-content a:hover {
+    text-decoration: underline;
+  }
