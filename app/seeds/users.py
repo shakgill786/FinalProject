@@ -5,6 +5,8 @@ def seed_users():
     users_data = [
         {"username": "Shak", "email": "shak@example.com", "password": "password", "role": "instructor"},
         {"username": "Emma", "email": "emma@example.com", "password": "password", "role": "student"},
+        {"username": "Demo Instructor", "email": "demo@instructor.com", "password": "password", "role": "instructor"},
+        {"username": "Demo Student", "email": "demo@student.com", "password": "password", "role": "student"},
     ]
 
     for data in users_data:

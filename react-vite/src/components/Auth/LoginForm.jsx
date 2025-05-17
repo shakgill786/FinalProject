@@ -27,6 +27,21 @@ export default function LoginForm() {
     }
   };
 
+  const handleDemoLogin = async (type) => {
+    setErrors([]);
+    const credentials = type === "instructor"
+      ? { email: "shak@example.com", password: "password" }
+      : { email: "emma@example.com", password: "password" };
+
+    const res = await dispatch(thunkLogin(credentials));
+
+    if (res?.errors) {
+      setErrors(res.errors);
+    } else {
+      navigate(res?.role === "instructor" ? "/dashboard/instructor" : "/dashboard/student");
+    }
+  };
+
   return (
     <div className="login-page">
       <div className="login-card">
@@ -61,6 +76,21 @@ export default function LoginForm() {
             Log In
           </button>
         </form>
+
+        <div className="demo-buttons">
+          <button
+            className="glow-button alt"
+            onClick={() => handleDemoLogin("instructor")}
+          >
+            Demo Instructor
+          </button>
+          <button
+            className="glow-button alt"
+            onClick={() => handleDemoLogin("student")}
+          >
+            Demo Student
+          </button>
+        </div>
 
         <div className="signup-button-container">
           <p className="signup-prompt">Don’t have an account?</p>

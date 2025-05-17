@@ -55,6 +55,41 @@ export const thunkLogin = (credentials) => async (dispatch) => {
     return { errors: ["Something went wrong. Please try again."] };
   }
 };
+export const thunkDemoLoginInstructor = () => async (dispatch) => {
+  const csrfToken = getCookie("csrf_token");
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    credentials: "include",
+    body: JSON.stringify({ email: "demo@instructor.com", password: "password" }),
+  });
+  if (response.ok) {
+    const data = await response.json();
+    dispatch(setUser(data));
+    return data;
+  } else return { errors: ["Demo login failed"] };
+};
+
+export const thunkDemoLoginStudent = () => async (dispatch) => {
+  const csrfToken = getCookie("csrf_token");
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    credentials: "include",
+    body: JSON.stringify({ email: "demo@student.com", password: "password" }),
+  });
+  if (response.ok) {
+    const data = await response.json();
+    dispatch(setUser(data));
+    return data;
+  } else return { errors: ["Demo login failed"] };
+};
 
 // ✅ Signup thunk
 export const thunkSignup = (userInfo) => async (dispatch) => {

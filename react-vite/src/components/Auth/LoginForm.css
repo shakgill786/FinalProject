@@ -90,3 +90,23 @@
   color: #000;
   transform: scale(1.05);
 }
+.demo-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.glow-button.demo {
+  background-color: #1c2b69;
+  border: 1px solid #1c2b69;
+  color: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.glow-button.demo:hover {
+  background-color: #00f7ff;
+  color: #000;
+  transform: scale(1.05);
+}
