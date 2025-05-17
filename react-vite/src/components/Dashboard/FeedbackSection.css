@@ -1,4 +1,4 @@
-/* react-vite/src/components/Dashboard/FeedbackSection.css */
+/* FeedbackSection.css */
 
 .feedback-section {
   margin-top: 10px;
@@ -19,53 +19,4 @@
   margin-left: 10px;
   color: red;
   cursor: pointer;
-}
-
-/* Scoped buttons for FeedbackSection */
-.feedback-section .modal-buttons {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 12px !important;
-  flex-wrap: wrap !important;
-  width: 100% !important;
-  margin-top: 16px !important;
-}
-
-.feedback-section .modal-buttons button {
-  width: 100px !important;
-  height: 42px !important;
-  border: none !important;
-  border-radius: 6px !important;
-  font-weight: 600 !important;
-  font-size: 0.95rem !important;
-  cursor: pointer !important;
-  transition: background-color 0.2s ease, transform 0.1s ease !important;
-  display: inline-flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
-.feedback-section .edit-btn {
-  background-color: #ffc107 !important;
-  color: #222 !important;
-}
-.feedback-section .edit-btn:hover {
-  background-color: #e0a800 !important;
-}
-
-.feedback-section .delete-btn {
-  background-color: #e74c3c !important;
-  color: white !important;
-}
-.feedback-section .delete-btn:hover {
-  background-color: #c0392b !important;
-}
-
-.feedback-section .done-btn {
-  background-color: #10b981 !important;
-  color: white !important;
-}
-.feedback-section .done-btn:hover {
-  background-color: #059669 !important;
 }
