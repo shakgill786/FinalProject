@@ -1,3 +1,5 @@
+/* react-vite/src/components/Dashboard/FeedbackSection.css */
+
 .feedback-section {
   margin-top: 10px;
   padding: 10px;
@@ -19,52 +21,51 @@
   cursor: pointer;
 }
 
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  width: 100%;
-  margin-top: 16px;
+/* Scoped buttons for FeedbackSection */
+.feedback-section .modal-buttons {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  margin-top: 16px !important;
 }
 
-
-.modal-buttons button {
-  flex: 0 0 100px;
-  height: 42px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+.feedback-section .modal-buttons button {
+  width: 100px !important;
+  height: 42px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease, transform 0.1s ease !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
-.edit-btn {
-  background-color: #ffc107;
-  color: #222;
+.feedback-section .edit-btn {
+  background-color: #ffc107 !important;
+  color: #222 !important;
 }
-.edit-btn:hover {
-  background-color: #e0a800;
-}
-
-.delete-btn {
-  background-color: #e74c3c;
-  color: white;
-}
-.delete-btn:hover {
-  background-color: #c0392b;
+.feedback-section .edit-btn:hover {
+  background-color: #e0a800 !important;
 }
 
-.done-btn {
-  background-color: #10b981;
-  color: white;
+.feedback-section .delete-btn {
+  background-color: #e74c3c !important;
+  color: white !important;
 }
-.done-btn:hover {
-  background-color: #059669;
+.feedback-section .delete-btn:hover {
+  background-color: #c0392b !important;
+}
+
+.feedback-section .done-btn {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+.feedback-section .done-btn:hover {
+  background-color: #059669 !important;
 }
