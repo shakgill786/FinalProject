@@ -15,11 +15,6 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-.feedback-modal-overlay.fade-out {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .feedback-modal {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
@@ -32,10 +27,6 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   animation: fadeInScale 0.3s ease-in-out;
   position: relative;
-}
-
-.feedback-modal.closing {
-  animation: fadeOutScale 0.2s ease-in-out forwards;
 }
 
 @keyframes fadeInScale {
@@ -62,12 +53,11 @@
 
 .feedback-modal h3 {
   font-size: 1.4rem;
-  margin: 0 0 15px;
+  margin-bottom: 15px;
   color: #1e3c72;
 }
 
-.quiz-selector,
-.quiz-select-label {
+.quiz-selector {
   display: block;
   margin-bottom: 1rem;
   font-weight: 600;
@@ -81,7 +71,6 @@
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  transition: border-color 0.2s;
 }
 .feedback-modal select:focus {
   border-color: #6c63ff;
@@ -96,7 +85,6 @@
   border: 1px solid #ccc;
   resize: vertical;
   margin-bottom: 10px;
-  transition: border-color 0.2s;
 }
 .feedback-modal textarea:focus {
   border-color: #6c63ff;
@@ -111,18 +99,19 @@
   margin-bottom: 16px;
 }
 
-/* Aligned and enforced spacing for buttons */
-.modal-buttons {
+/* ⬇️ Scoped version of .modal-buttons */
+.feedback-modal .modal-buttons {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  flex-wrap: wrap !important;
   gap: 12px !important;
   margin-top: 16px !important;
   width: 100% !important;
-  flex-wrap: wrap !important;
 }
 
-.modal-buttons button {
+/* ⬇️ Scoped button styles */
+.feedback-modal .modal-buttons button {
   width: 100px !important;
   height: 42px !important;
   padding: 10px 0 !important;
@@ -134,85 +123,54 @@
   display: inline-flex !important;
   justify-content: center !important;
   align-items: center !important;
-  transition: background-color 0.2s, transform 0.1s !important;
+  transition: background-color 0.2s ease, transform 0.1s ease !important;
 }
-.modal-buttons button:active {
+.feedback-modal .modal-buttons button:active {
   transform: scale(0.98);
 }
 
-/* Button styles */
-.submit-btn {
+/* Scoped Button Variants */
+.feedback-modal .submit-btn {
   background-color: #6c63ff !important;
   color: white !important;
 }
-.submit-btn:hover {
+.feedback-modal .submit-btn:hover {
   background-color: #564ee0 !important;
 }
 
-.cancel-btn {
+.feedback-modal .cancel-btn {
   background-color: #ccc !important;
   color: #333 !important;
 }
-.cancel-btn:hover {
+.feedback-modal .cancel-btn:hover {
   background-color: #aaa !important;
 }
 
-.edit-btn {
+.feedback-modal .edit-btn {
   background-color: #ffc107 !important;
   color: #222 !important;
 }
-.edit-btn:hover {
+.feedback-modal .edit-btn:hover {
   background-color: #e0a800 !important;
 }
 
-.delete-btn {
+.feedback-modal .delete-btn {
   background-color: #e74c3c !important;
   color: white !important;
 }
-.delete-btn:hover {
+.feedback-modal .delete-btn:hover {
   background-color: #c0392b !important;
 }
 
-.done-btn {
+.feedback-modal .done-btn {
   background-color: #10b981 !important;
   color: white !important;
 }
-.done-btn:hover {
+.feedback-modal .done-btn:hover {
   background-color: #059669 !important;
 }
 
-/* Scroll shadow effect */
-.feedback-modal::before,
-.feedback-modal::after {
-  content: "";
-  position: sticky;
-  left: 0;
-  right: 0;
-  height: 20px;
-  pointer-events: none;
-  z-index: 1;
-}
-.feedback-modal::before {
-  top: 0;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
-}
-.feedback-modal::after {
-  bottom: 0;
-  background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
-}
-
-.modal-exit-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #333;
-  transition: color 0.2s;
-  z-index: 1;
-}
-.modal-exit-btn:hover {
-  color: #e74c3c;
+/* Optional: Hide duplicate styles from FeedbackSection */
+.feedback-section .modal-buttons {
+  all: unset;
 }
