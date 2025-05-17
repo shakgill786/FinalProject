@@ -1,3 +1,5 @@
+/* InstructorClassroomsDashboard.css (Updated for button spacing) */
+
 .classrooms-dashboard {
   padding: 40px;
   max-width: 1200px;
@@ -11,7 +13,6 @@
   color: #1e2a38;
 }
 
-/* Create Classroom */
 .create-classroom {
   display: flex;
   justify-content: center;
@@ -40,7 +41,6 @@
   background-color: #6d28d9;
 }
 
-/* Classroom Cards */
 .classroom-list {
   display: flex;
   flex-wrap: wrap;
@@ -66,7 +66,6 @@
   font-weight: bold;
 }
 
-/* Classroom Buttons */
 .classroom-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -103,7 +102,6 @@
   filter: brightness(0.9);
 }
 
-/* Student Feedback Cards */
 .student-feedback-card {
   background: #f9fafb;
   border-radius: 8px;
@@ -125,7 +123,6 @@
   margin-bottom: 8px;
 }
 
-/* Feedback Entries */
 .feedback-entry {
   background: white;
   padding: 8px;
@@ -157,7 +154,46 @@
   filter: brightness(0.95);
 }
 
-/* Edit Drawer */
+/* 🔧 Feedback Modal Button Alignment Fix */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+.modal-buttons button {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #222;
+}
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+.done-btn {
+  background-color: #10b981;
+  color: white;
+}
+.done-btn:hover {
+  background-color: #059669;
+}
+
 .edit-drawer {
   position: fixed;
   top: 0;
@@ -197,7 +233,6 @@
   background-color: #ef4444;
 }
 
-/* ====== Delete Confirmation Modal ====== */
 .confirm-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
