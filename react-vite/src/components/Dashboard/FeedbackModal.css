@@ -111,73 +111,77 @@
   margin-bottom: 16px;
 }
 
+/* Aligned and enforced spacing for buttons */
 .modal-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  width: 100%;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+  width: 100% !important;
+  flex-wrap: wrap !important;
 }
 
 .modal-buttons button {
-  width: 100px;
-  height: 42px;
-  padding: 10px 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.2s, transform 0.1s;
+  width: 100px !important;
+  height: 42px !important;
+  padding: 10px 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: background-color 0.2s, transform 0.1s !important;
 }
 .modal-buttons button:active {
   transform: scale(0.98);
 }
 
+/* Button styles */
 .submit-btn {
-  background-color: #6c63ff;
-  color: white;
+  background-color: #6c63ff !important;
+  color: white !important;
 }
 .submit-btn:hover {
-  background-color: #564ee0;
+  background-color: #564ee0 !important;
 }
 
 .cancel-btn {
-  background-color: #ccc;
-  color: #333;
+  background-color: #ccc !important;
+  color: #333 !important;
 }
 .cancel-btn:hover {
-  background-color: #aaa;
+  background-color: #aaa !important;
 }
 
 .edit-btn {
-  background-color: #ffc107;
-  color: #222;
+  background-color: #ffc107 !important;
+  color: #222 !important;
 }
 .edit-btn:hover {
-  background-color: #e0a800;
+  background-color: #e0a800 !important;
 }
 
 .delete-btn {
-  background-color: #e74c3c;
-  color: white;
+  background-color: #e74c3c !important;
+  color: white !important;
 }
 .delete-btn:hover {
-  background-color: #c0392b;
+  background-color: #c0392b !important;
 }
 
 .done-btn {
-  background-color: #10b981;
-  color: white;
+  background-color: #10b981 !important;
+  color: white !important;
 }
 .done-btn:hover {
-  background-color: #059669;
+  background-color: #059669 !important;
 }
 
+/* Scroll shadow effect */
 .feedback-modal::before,
 .feedback-modal::after {
   content: "";
@@ -190,11 +194,11 @@
 }
 .feedback-modal::before {
   top: 0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.9), transparent);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
 }
 .feedback-modal::after {
   bottom: 0;
-  background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
 }
 
 .modal-exit-btn {
