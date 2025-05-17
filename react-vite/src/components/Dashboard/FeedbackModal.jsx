@@ -1,5 +1,3 @@
-// react-vite/src/components/Dashboard/FeedbackModal.jsx
-
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -17,7 +15,6 @@ export default function FeedbackModal({ student, classroom, onClose }) {
   const [submitting, setSubmitting] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState("general");
   const [editMode, setEditMode] = useState(false);
-
   const [availableQuizzes, setAvailableQuizzes] = useState([]);
 
   useEffect(() => {
@@ -30,10 +27,9 @@ export default function FeedbackModal({ student, classroom, onClose }) {
   useEffect(() => {
     async function loadAvailable() {
       try {
-        const res = await fetch(
-          `/api/classrooms/${classroom.id}/assignments`,
-          { credentials: "include" }
-        );
+        const res = await fetch(`/api/classrooms/${classroom.id}/assignments`, {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error();
         const data = await res.json();
 
@@ -45,9 +41,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
         if (!qRes.ok) throw new Error();
         const allQuizzes = await qRes.json();
 
-        setAvailableQuizzes(
-          allQuizzes.filter((q) => allIds.includes(q.id))
-        );
+        setAvailableQuizzes(allQuizzes.filter((q) => allIds.includes(q.id)));
       } catch {
         setAvailableQuizzes(classroom.quizzes || []);
       }
@@ -79,7 +73,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     const res = await dispatch(action);
     setSubmitting(false);
     if (!res.error) {
-      await dispatch(thunkLoadFeedback(student.id)); // ✅ Force refresh
+      await dispatch(thunkLoadFeedback(student.id));
       onClose();
     } else {
       alert("Error saving feedback.");
@@ -90,7 +84,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
     if (!existingFeedback) return;
     if (!window.confirm("Delete this feedback?")) return;
     await dispatch(thunkDeleteFeedback(existingFeedback.id));
-    await dispatch(thunkLoadFeedback(student.id)); // ✅ Force refresh
+    await dispatch(thunkLoadFeedback(student.id));
     onClose();
   };
 
@@ -136,11 +130,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
               >
                 🗑️ Delete
               </button>
-              <button
-                type="button"
-                className="done-btn"
-                onClick={onClose}
-              >
+              <button type="button" className="done-btn" onClick={onClose}>
                 ✅ Done
               </button>
             </div>
@@ -155,11 +145,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
               required
             />
             <div className="modal-buttons">
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={onClose}
-              >
+              <button type="button" className="cancel-btn" onClick={onClose}>
                 ❌ Cancel
               </button>
               <button
