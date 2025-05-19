@@ -1,4 +1,4 @@
-/* ─── Base Navbar ───────────────────────────────────────────────────────── */
+/* NavBar.css */
 
 .navbar {
   position: sticky;
@@ -24,8 +24,6 @@
   height: 110px;
 }
 
-/* ─── Nav Links ─────────────────────────────────────────────────────────── */
-
 .nav-links {
   display: flex;
   align-items: center;
@@ -39,8 +37,6 @@
   font-weight: 500;
   padding: 0.3rem 0.5rem;
 }
-
-/* animated underline */
 .nav-item::after {
   content: "";
   position: absolute;
@@ -82,7 +78,7 @@
   background: #feecec;
 }
 
-/* ─── Logout Confirmation Modal ─────────────────────────────────────────── */
+/* ─── Logout Modal ────────────────────────────── */
 
 .logout-modal-overlay {
   position: fixed;
@@ -116,13 +112,14 @@
   margin-bottom: 1.5rem;
 }
 
-.logout-modal .modal-buttons {
+/* 🎯 Scoped logout modal buttons */
+.logout-modal-buttons {
   display: flex;
   gap: 12px;
   justify-content: center;
 }
 
-.logout-modal .modal-buttons button {
+.logout-modal-buttons button {
   flex: 1;
   padding: 8px 0;
   border: none;
@@ -132,18 +129,18 @@
   transition: filter 0.2s ease;
 }
 
-.logout-modal .modal-buttons .cancel-btn {
+.logout-modal-buttons .cancel-btn {
   background-color: #ccc;
   color: #000;
 }
-.logout-modal .modal-buttons .cancel-btn:hover {
+.logout-modal-buttons .cancel-btn:hover {
   filter: brightness(0.9);
 }
 
-.logout-modal .modal-buttons .confirm-btn {
+.logout-modal-buttons .confirm-btn {
   background-color: #e74c3c;
   color: #fff;
 }
-.logout-modal .modal-buttons .confirm-btn:hover {
+.logout-modal-buttons .confirm-btn:hover {
   filter: brightness(0.9);
 }

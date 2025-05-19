@@ -12,7 +12,6 @@
   justify-content: center;
   align-items: center;
   z-index: 2000;
-  transition: opacity 0.2s ease-in-out;
 }
 
 .feedback-modal {
@@ -40,17 +39,6 @@
   }
 }
 
-@keyframes fadeOutScale {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
 .feedback-modal h3 {
   font-size: 1.4rem;
   margin-bottom: 15px;
@@ -64,113 +52,134 @@
   color: #333;
 }
 
-.feedback-modal select {
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-.feedback-modal select:focus {
-  border-color: #6c63ff;
-  outline: none;
-}
-
+.feedback-modal select,
 .feedback-modal textarea {
   width: 100%;
   padding: 10px;
-  font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+.feedback-modal textarea {
   resize: vertical;
   margin-bottom: 10px;
 }
+.feedback-modal select:focus,
 .feedback-modal textarea:focus {
   border-color: #6c63ff;
   outline: none;
 }
 
 .existing-feedback {
-  background: #ffffff;
+  background: #fff;
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 16px;
 }
 
-/* ⬇️ Scoped version of .modal-buttons */
-.feedback-modal .modal-buttons {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 12px !important;
-  margin-top: 16px !important;
-  width: 100% !important;
+/* 🎯 Scoped feedback modal button container */
+.feedback-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
 }
 
-/* ⬇️ Scoped button styles */
-.feedback-modal .modal-buttons button {
-  width: 100px !important;
-  height: 42px !important;
-  padding: 10px 0 !important;
-  font-size: 0.95rem !important;
-  font-weight: 600 !important;
-  border: none !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  display: inline-flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  transition: background-color 0.2s ease, transform 0.1s ease !important;
+.feedback-modal-buttons button {
+  flex: 1 1 30%;
+  min-width: 85px;
+  height: 42px;
+  padding: 10px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.feedback-modal .modal-buttons button:active {
+.feedback-modal-buttons button:active {
   transform: scale(0.98);
 }
 
-/* Scoped Button Variants */
-.feedback-modal .submit-btn {
-  background-color: #6c63ff !important;
-  color: white !important;
+/* 🎨 Button colors */
+.feedback-modal-buttons .submit-btn {
+  background-color: #6c63ff;
+  color: white;
 }
-.feedback-modal .submit-btn:hover {
-  background-color: #564ee0 !important;
-}
-
-.feedback-modal .cancel-btn {
-  background-color: #ccc !important;
-  color: #333 !important;
-}
-.feedback-modal .cancel-btn:hover {
-  background-color: #aaa !important;
+.feedback-modal-buttons .submit-btn:hover {
+  background-color: #564ee0;
 }
 
-.feedback-modal .edit-btn {
-  background-color: #ffc107 !important;
-  color: #222 !important;
+.feedback-modal-buttons .cancel-btn {
+  background-color: #ccc;
+  color: #333;
 }
-.feedback-modal .edit-btn:hover {
-  background-color: #e0a800 !important;
-}
-
-.feedback-modal .delete-btn {
-  background-color: #e74c3c !important;
-  color: white !important;
-}
-.feedback-modal .delete-btn:hover {
-  background-color: #c0392b !important;
+.feedback-modal-buttons .cancel-btn:hover {
+  background-color: #aaa;
 }
 
-.feedback-modal .done-btn {
-  background-color: #10b981 !important;
-  color: white !important;
+.feedback-modal-buttons .edit-btn {
+  background-color: #ffc107;
+  color: #222;
 }
-.feedback-modal .done-btn:hover {
-  background-color: #059669 !important;
+.feedback-modal-buttons .edit-btn:hover {
+  background-color: #e0a800;
 }
 
-/* Optional: Hide duplicate styles from FeedbackSection */
-.feedback-section .modal-buttons {
-  all: unset;
+.feedback-modal-buttons .delete-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+.feedback-modal-buttons .delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.feedback-modal-buttons .done-btn {
+  background-color: #10b981;
+  color: white;
+}
+.feedback-modal-buttons .done-btn:hover {
+  background-color: #059669;
+}
+
+/* 🛡 Scoped logout modal buttons */
+.logout-modal .logout-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.logout-modal .logout-modal-buttons button {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-modal .logout-modal-buttons .cancel-btn {
+  background-color: #ccc;
+  color: #000;
+}
+.logout-modal .logout-modal-buttons .cancel-btn:hover {
+  background-color: #aaa;
+}
+
+.logout-modal .logout-modal-buttons .confirm-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+.logout-modal .logout-modal-buttons .confirm-btn:hover {
+  background-color: #c0392b;
 }

@@ -112,7 +112,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
           <div className="existing-feedback">
             <strong>Previous Feedback:</strong>
             <p>{existingFeedback.content}</p>
-            <div className="modal-buttons">
+            <div className="feedback-modal-buttons">
               <button
                 type="button"
                 className="edit-btn"
@@ -144,7 +144,7 @@ export default function FeedbackModal({ student, classroom, onClose }) {
               rows={5}
               required
             />
-            <div className="modal-buttons">
+            <div className="feedback-modal-buttons">
               <button type="button" className="cancel-btn" onClick={onClose}>
                 ❌ Cancel
               </button>

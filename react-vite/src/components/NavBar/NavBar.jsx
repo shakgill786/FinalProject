@@ -1,3 +1,5 @@
+// react-vite/src/components/NavBar/NavBar.jsx
+
 import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -21,7 +23,6 @@ export default function NavBar() {
     navigate("/login");
   };
 
-  // Capitalize first letter
   const capitalized =
     sessionUser?.username
       ? sessionUser.username.charAt(0).toUpperCase() + sessionUser.username.slice(1)
@@ -58,7 +59,6 @@ export default function NavBar() {
             <NavLink to="/login" className="nav-item login-btn">🔐 Log In</NavLink>
           ) : (
             <>
-              {/* profile link with capitalized name */}
               <Link to="/profile" className="nav-item welcome-text">
                 👋 {capitalized}
               </Link>
@@ -75,13 +75,10 @@ export default function NavBar() {
 
       {showLogoutModal && (
         <div className="logout-modal-overlay" onClick={closeLogoutModal}>
-          <div
-            className="logout-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
             <h3>🚪 Confirm Log Out</h3>
             <p>Are you sure you want to log out?</p>
-            <div className="modal-buttons">
+            <div className="logout-modal-buttons">
               <button
                 type="button"
                 className="cancel-btn"
