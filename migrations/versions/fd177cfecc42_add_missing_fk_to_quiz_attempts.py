@@ -1,8 +1,8 @@
-"""Force fresh schema after db reset
+"""Add missing FK to quiz_attempts
 
-Revision ID: 58fbe4ddb3fc
+Revision ID: fd177cfecc42
 Revises: 
-Create Date: 2025-06-12 10:30:30.512220
+Create Date: 2025-06-12 10:37:49.709894
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '58fbe4ddb3fc'
+revision = 'fd177cfecc42'
 down_revision = None
 branch_labels = None
 depends_on = None
