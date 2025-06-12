@@ -13,6 +13,7 @@ from .api.classroom_routes import classroom_routes
 from .api.user_routes import user_routes
 from .api.feedback_routes import feedback_routes
 
+# ─── App Setup ────────────────────────────────────────────────────
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
 
 # ─── Configuration ────────────────────────────────────────────────
@@ -20,7 +21,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///dev.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = "None"
-app.config['SESSION_COOKIE_SECURE'] = True  # ✅ For production
+app.config['SESSION_COOKIE_SECURE'] = True
 
 # ─── Extensions ───────────────────────────────────────────────────
 db.init_app(app)
@@ -65,7 +66,7 @@ def serve_react(path):
     if path.startswith("api"):
         return jsonify({"error": "Not found"}), 404
 
-    try:
+    file_path = os.path.join(app.static_folder, path)
+    if os.path.exists(file_path):
         return send_from_directory(app.static_folder, path)
-    except:
-        return send_from_directory(app.static_folder, "index.html")
+    return send_from_directory(app.static_folder, "index.html")
