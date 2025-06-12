@@ -14,7 +14,7 @@ from .api.user_routes import user_routes
 from .api.feedback_routes import feedback_routes
 
 # ─── App Setup ────────────────────────────────────────────────────
-app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
+app = Flask(__name__, static_folder='static', static_url_path='/')
 
 # ─── Configuration ────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
